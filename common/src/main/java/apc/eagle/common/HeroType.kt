@@ -16,6 +16,7 @@ class HeroType : UnitType() {
     val defaultEquips = arrayOf(IntArray(6), IntArray(6), IntArray(6))
     val equips = IntArray(6)
     val defaultRunes = IntArray(3)
+    val runes = mutableMapOf<Int, Int>()
     val abilities = IntArray(4)
 
     var speedModel = 0
@@ -29,6 +30,13 @@ class HeroType : UnitType() {
     fun setEquips(vararg names: String) {
         equips.fill(0)
         names.mapNotNull(Equip.nameMap::get).map { it.id }.toIntArray().copyInto(equips)
+    }
+
+    fun useDefaultRunes() {
+        runes.clear()
+        runes[defaultRunes[0]] = 10
+        runes[defaultRunes[1]] = 10
+        runes[defaultRunes[2]] = 10
     }
 
     fun rawFrames(speed: Int): Int {

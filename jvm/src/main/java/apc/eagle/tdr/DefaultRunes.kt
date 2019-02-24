@@ -33,6 +33,7 @@ class DefaultRunes : BaseRowModel() {
                 defaultRunes[0] = RuneInfo.level5Runes[row.red]!!
                 defaultRunes[1] = RuneInfo.level5Runes[row.blue]!!
                 defaultRunes[2] = RuneInfo.level5Runes[row.green]!!
+                useDefaultRunes()
                 println(row)
             }
         }

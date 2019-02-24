@@ -55,10 +55,30 @@ class RuneInfo : BaseRowModel() {
         it.name = name
         it.level = level
         it.color = color
-        it.attributes[type1] = value1
+        it.setAttribute(type1, value1)
         if (type2.isNotEmpty()) {
-            it.attributes[type2] = value2
-            if (type3.isNotEmpty()) it.attributes[type3] = value3
+            it.setAttribute(type2, value2)
+            if (type3.isNotEmpty()) it.setAttribute(type3, value3)
+        }
+    }
+
+    private fun Rune.setAttribute(type: String, value: Int) {
+        when (type) {
+            "最大生命" -> hp = value
+            "生命回复" -> regen = value
+            "物理攻击力" -> attack = value
+            "攻速加成" -> attackSpeed = value / 1000
+            "暴击率" -> critical = value
+            "暴击效果" -> criticalDamage = value
+            "法术攻击力" -> magic = value
+            "冷却缩减" -> cdr = value
+            "物理防御力" -> defense = value
+            "法术防御力" -> magicDefense = value
+            "物理护甲穿透" -> penetrate = value
+            "法术护甲穿透" -> magicPenetrate = value
+            "物理吸血" -> drain = value
+            "法术吸血" -> magicDrain = value
+            "移速" -> moveSpeed = value
         }
     }
 
