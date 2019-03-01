@@ -1,9 +1,10 @@
 package apc.eagle.tdr
 
-import apc.eagle.common.Hero
-import apc.eagle.common.HeroType
 import apc.eagle.common.SpeedModel
+import java.nio.file.Files
+import java.nio.file.Path
 import java.nio.file.Paths
+import java.nio.file.StandardCopyOption
 
 fun main(args: Array<String>) {
     if (args.isNotEmpty()) Tdr.root = Paths.get(args[0])
@@ -12,7 +13,8 @@ fun main(args: Array<String>) {
 
 object Tdr {
 
-    var root = Paths.get("D:\\Kings\\trunk\\Tdr\\ResConvert\\data_xls")!!
+//    var root = Paths.get("D:\\Kings\\trunk\\Tdr\\ResConvert\\data_xls")!!
+    var root = Paths.get("")!!
 
     fun load() {
         Equipment.load()
@@ -20,16 +22,26 @@ object Tdr {
         HeroEnable.load()
         HeroInfo.load(HeroEnable.ids)
         DefaultEquipments.load()
-        DefaultRunes.load()
+        RuneConfig.load()
         AbilityInfo.load()
         SpeedModel.initHeroes()
+    }
 
-        HeroType.idMap.values.filter { it.category == "射手" }.sortedBy { it.order }.forEach {
-            it.buildSpeeds()
-            val hero = Hero(it)
-            hero.level = 15
-            hero.updateAttributes()
-            println("${it.name} ${hero.baseAttackSpeed} ${hero.attackFrames(hero.baseAttackSpeed)} $it")
+    @Suppress("unused")
+    private fun copyResources() {
+        val icon = Paths.get("D:\\Kings\\trunk\\UI\\5_Dynamic\\Icon")
+        val res = Paths.get("resources")
+        res.toFile().mkdirs()
+        HeroEnable.ids.forEach {
+            val name = "30${it}0.png"
+            Files.copy(
+                icon + name,
+                res + "hero" + name,
+                StandardCopyOption.REPLACE_EXISTING,
+                StandardCopyOption.COPY_ATTRIBUTES
+            )
         }
     }
 }
+
+operator fun Path.plus(other: String) = resolve(other)!!

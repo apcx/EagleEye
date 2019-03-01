@@ -1,5 +1,7 @@
 package apc.eagle.common
 
+import kotlin.math.min
+
 class Hero(val type: HeroType) {
 
     var level = 1
@@ -16,5 +18,5 @@ class Hero(val type: HeroType) {
         }
     }
 
-    fun attackFrames(speed: Int) = SpeedModel[type.speedModel]?.frames(speed) ?: type.rawFrames(speed) + type.swing
+    val expectedSpeed get() = min(baseAttackSpeed + type.passiveSpeed, 2000)
 }

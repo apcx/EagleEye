@@ -60,24 +60,32 @@ class HeroInfo : BaseRowModel() {
 
     override fun toString() = Json.stringify(serializer, this)
 
-    fun toType() = HeroType().also {
-        it.id = id
-        it.name = name
-        if ("远程" in attackType) it.attackType = 2
-        it.baseHp = baseHp
-        it.baseRegen = baseRegen
-        it.baseAttack = baseAttack
-        it.baseDefense = baseDefense
-        it.baseMove = baseMove
+    fun toType(): HeroType {
+        val type = try {
+            Class.forName("apc.eagle.common.hero.Hero$id").newInstance() as HeroType
+        } catch (e: ClassNotFoundException) {
+            HeroType()
+        }
+        type.id = id
+        type.name = name
+        if ("远程" in attackType) type.attackType = 2
+        type.baseHp = baseHp
+        type.baseRegen = baseRegen
+        type.baseAttack = baseAttack
+        type.baseDefense = baseDefense
+        type.baseMove = baseMove
 
-        it.category = if ("辅助" in category) "辅助" else category
-        it.secondaryCategory = if ("辅助" in secondaryCategory) "辅助" else secondaryCategory
-        it.order = order
-        it.bonusHp = bonusHp
-        it.bonusRegen = bonusRegen
-        it.bonusAttack = bonusAttack
-        it.bonusAttackSpeed = bonusAttackSpeed / 100000
-        it.bonusDefense = bonusDefense
+        type.category = if ("辅助" in category) "辅助" else category
+        type.secondaryCategory = if ("辅助" in secondaryCategory) "辅助" else secondaryCategory
+        type.order = order
+        type.bonusHp = bonusHp
+        type.bonusRegen = bonusRegen
+        type.bonusAttack = bonusAttack
+        type.bonusAttackSpeed = bonusAttackSpeed / 100000
+        type.bonusDefense = bonusDefense
+
+        if (name == "后羿" || name == "狄仁杰") type.passiveSpeed = 300
+        return type
     }
 
     companion object : Table<HeroInfo>() {

@@ -16,9 +16,13 @@ class SpeedModel(val swing: Int = 2) {
             put(3, SpeedModel(1).apply {
                 heroes = arrayOf("苏烈", "孙策", "猪八戒", "达摩", "李信", "宫本武藏", "百里玄策", "裴擒虎", "米莱狄", "上官婉儿", "伽罗")
             })
-            put(4, SpeedModel(2).apply {
+            put(4, SpeedModel().apply {
                 heroes = arrayOf("司马懿", "李元芳")
                 speeds = intArrayOf(10, 82, 166, 262, 376, 514, 682, 864, 1092, 1394, 1788)
+            })
+            put(10, SpeedModel(0).apply {
+                heroes = arrayOf("后羿")
+                speeds = intArrayOf(300, 426, 576, 774, 1032, 1364, 1834)
             })
         }
 

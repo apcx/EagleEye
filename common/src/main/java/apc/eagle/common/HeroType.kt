@@ -3,7 +3,7 @@ package apc.eagle.common
 import apc.eagle.common.GameData.MS_FRAME
 import com.google.gson.Gson
 
-class HeroType : UnitType() {
+open class HeroType : UnitType() {
 
     var category = ""
     var secondaryCategory = ""
@@ -16,12 +16,16 @@ class HeroType : UnitType() {
     val defaultEquips = arrayOf(IntArray(6), IntArray(6), IntArray(6))
     val equips = IntArray(6)
     val defaultRunes = IntArray(3)
-    val runes = mutableMapOf<Int, Int>()
+    val redRunes = mutableMapOf<Int, Int>()
+    val blueRunes = mutableMapOf<Int, Int>()
+    val greenRunes = mutableMapOf<Int, Int>()
+    val runes get() = mutableMapOf<Int, Int>() + redRunes + blueRunes + greenRunes
     val abilities = IntArray(4)
 
     var speedModel = 0
     var swing = 2
     lateinit var speeds: IntArray
+    var passiveSpeed = 0
 
     fun useDefaultEquips(index: Int = 0) {
         defaultEquips[index].copyInto(equips)
@@ -33,40 +37,46 @@ class HeroType : UnitType() {
     }
 
     fun useDefaultRunes() {
-        runes.clear()
-        runes[defaultRunes[0]] = 10
-        runes[defaultRunes[1]] = 10
-        runes[defaultRunes[2]] = 10
+        redRunes.clear()
+        blueRunes.clear()
+        greenRunes.clear()
+        redRunes[defaultRunes[0]] = 10
+        blueRunes[defaultRunes[1]] = 10
+        greenRunes[defaultRunes[2]] = 10
     }
 
-    fun rawFrames(speed: Int): Int {
-        val ms = attackCd * 1000 / (1000 + speed)
-        var frames = ms / MS_FRAME
-        if (ms % MS_FRAME != 0) ++frames
-        return frames
+    fun initSpeeds() {
+        if (!::speeds.isInitialized) speeds = buildSpeeds(attackCd)
     }
 
-    fun buildSpeeds() {
-        if (!::speeds.isInitialized) {
-            val list = mutableListOf<Int>()
-            var old = rawFrames(0)
-            repeat(1999) {
-                val speed = 1 + it
-                val frames = rawFrames(speed)
-                if (old != frames) {
-                    old = frames
-                    list += speed
-                }
-            }
-            speeds = list.toIntArray()
-        }
-    }
+    open fun attackFrames(speed: Int) = SpeedModel[speedModel]?.frames(speed) ?: speedFrames(attackCd, speed) + swing
 
     override fun toString() = json
 
     companion object {
         val idMap = mutableMapOf<Int, HeroType>()
         val nameMap = mutableMapOf<String, HeroType>()
+
+        fun speedFrames(cd: Int, speed: Int): Int {
+            val ms = cd * 1000 / (1000 + speed)
+            var frames = ms / MS_FRAME
+            if (ms % MS_FRAME != 0) ++frames
+            return frames
+        }
+
+        fun buildSpeeds(cd: Int, max: Int = 200): IntArray {
+            val list = mutableListOf<Int>()
+            var old = speedFrames(cd, 0)
+            repeat(max * 10 - 1) {
+                val speed = 1 + it
+                val frames = speedFrames(cd, speed)
+                if (old != frames) {
+                    old = frames
+                    list += speed
+                }
+            }
+            return list.toIntArray()
+        }
     }
 }
 
