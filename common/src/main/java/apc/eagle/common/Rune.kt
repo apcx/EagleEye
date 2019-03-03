@@ -1,11 +1,14 @@
 package apc.eagle.common
 
+fun Int.toRune() = Rune.idMap[this]
+fun String.toRune() = Rune.nameMap[this]
+
 class Rune {
 
     var id = 0
     var name = ""
     var level = 1
-    var color = ""
+    var color = 0
 
     var hp = 0
     var regen = 0
@@ -26,6 +29,9 @@ class Rune {
     override fun toString() = json
 
     companion object {
+        const val RED = 1
+        const val BLUE = 2
+        const val GREEN = 3
         val idMap = mutableMapOf<Int, Rune>()
         val nameMap = mutableMapOf<String, Rune>()
     }

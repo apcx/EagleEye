@@ -58,6 +58,9 @@ class HeroInfo : BaseRowModel() {
     @ExcelProperty("英雄面板排序Id", index = 113)
     var order = 0
 
+    @ExcelProperty(index = 131)
+    var runeConfig = 0
+
     override fun toString() = Json.stringify(serializer, this)
 
     fun toType(): HeroType {
@@ -83,6 +86,7 @@ class HeroInfo : BaseRowModel() {
         type.bonusAttack = bonusAttack
         type.bonusAttackSpeed = bonusAttackSpeed / 100000
         type.bonusDefense = bonusDefense
+        type.defaultRuneConfig = runeConfig
 
         if (name == "后羿" || name == "狄仁杰") type.passiveSpeed = 300
         return type
@@ -93,11 +97,11 @@ class HeroInfo : BaseRowModel() {
         private val serializer = HeroInfo.serializer()
         override fun invoke(row: HeroInfo, context: AnalysisContext) {
             @Suppress("UNCHECKED_CAST")
-            if (row.id in context.custom as Collection<Int>) {
+            if (row.id in HeroEnable.ids && row.id !in HeroType.idMap) {
                 val type = row.toType()
                 HeroType.idMap[row.id] = type
                 HeroType.nameMap[row.name] = type
-                println(type)
+                println(row)
             }
         }
     }

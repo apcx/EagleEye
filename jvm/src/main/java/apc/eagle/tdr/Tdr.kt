@@ -1,8 +1,8 @@
 package apc.eagle.tdr
 
+import apc.common.plus
 import apc.eagle.common.SpeedModel
 import java.nio.file.Files
-import java.nio.file.Path
 import java.nio.file.Paths
 import java.nio.file.StandardCopyOption
 
@@ -13,16 +13,17 @@ fun main(args: Array<String>) {
 
 object Tdr {
 
-//    var root = Paths.get("D:\\Kings\\trunk\\Tdr\\ResConvert\\data_xls")!!
+    //    var root = Paths.get("D:\\Kings\\trunk\\Tdr\\ResConvert\\data_xls")!!
     var root = Paths.get("")!!
 
     fun load() {
         Equipment.load()
         RuneInfo.load()
+        DefaultRuneConfig.load()
         HeroEnable.load()
-        HeroInfo.load(HeroEnable.ids)
+        HeroInfo.load()
         DefaultEquipments.load()
-        RuneConfig.load()
+        RecommendedRuneConfig.load()
         AbilityInfo.load()
         SpeedModel.initHeroes()
     }
@@ -43,5 +44,3 @@ object Tdr {
         }
     }
 }
-
-operator fun Path.plus(other: String) = resolve(other)!!

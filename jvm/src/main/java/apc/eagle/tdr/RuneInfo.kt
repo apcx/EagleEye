@@ -54,7 +54,11 @@ class RuneInfo : BaseRowModel() {
         it.id = id
         it.name = name
         it.level = level
-        it.color = color
+        when (color) {
+            "红色符文" -> it.color = Rune.RED
+            "黄色符文" -> it.color = Rune.BLUE
+            "蓝色符文" -> it.color = Rune.GREEN
+        }
         it.setAttribute(type1, value1)
         if (type2.isNotEmpty()) {
             it.setAttribute(type2, value2)
@@ -92,9 +96,9 @@ class RuneInfo : BaseRowModel() {
                 Rune.idMap[row.id] = type
                 if (row.level == 5) {
                     level5Runes[row.level1Rune] = row.id
-                    Rune.nameMap[row.name]
+                    Rune.nameMap[row.name] = type
                 }
-                println(type)
+                println(row)
             }
         }
     }

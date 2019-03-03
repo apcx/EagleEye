@@ -1,5 +1,6 @@
 package apc.eagle.fx
 
+import apc.common.plus
 import apc.eagle.common.Equip
 import apc.eagle.common.HeroType
 import javafx.geometry.Insets
@@ -14,7 +15,7 @@ import javafx.scene.layout.HBox
 import javafx.scene.layout.TilePane
 import javafx.scene.layout.VBox
 
-class EquipPane(private val type: HeroType) : BorderPane() {
+class EquipPane(type: HeroType) : BorderPane() {
 
     private val group = ToggleGroup()
     private var category = 1

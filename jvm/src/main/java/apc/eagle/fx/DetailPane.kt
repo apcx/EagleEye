@@ -1,23 +1,23 @@
 package apc.eagle.fx
 
+import apc.common.IntSlider
+import apc.common.plus
+import apc.common.startStage
 import apc.eagle.common.Equip
 import apc.eagle.common.Hero
 import apc.eagle.common.HeroType
 import apc.eagle.common.Rune
 import javafx.geometry.Insets
 import javafx.geometry.Pos
-import javafx.scene.Scene
 import javafx.scene.chart.NumberAxis
 import javafx.scene.chart.StackedAreaChart
 import javafx.scene.chart.XYChart
 import javafx.scene.control.Button
 import javafx.scene.control.Label
 import javafx.scene.control.Labeled
-import javafx.scene.control.Slider
 import javafx.scene.layout.VBox
 import javafx.scene.paint.Color
 import javafx.scene.text.Text
-import javafx.stage.Stage
 
 class DetailPane(private val type: HeroType) : VBox() {
 
@@ -54,37 +54,25 @@ class DetailPane(private val type: HeroType) : VBox() {
         chart.title = "${type.name} 攻速档位"
         chart.prefWidth = 600.0
 
-        val slider = Slider(1.0, 15.0, 15.0)
-        slider.blockIncrement = 1.0
-        slider.majorTickUnit = 1.0
-        slider.minorTickCount = 0
-        slider.isSnapToTicks = true
-        slider.isShowTickMarks = true
-        slider.isShowTickLabels = true
-        slider.valueProperty().addListener { _, _, newValue ->
-            hero.level = newValue.toInt()
+        val slider = IntSlider(1, 15) {
+            hero.level = it
             updateChart()
         }
 
         val equipsButton = Button(type.equips.joinToString { id -> Equip.idMap[id]!!.name })
         equipsButton.setOnAction {
-            val stage = Stage()
-            stage.title = "${type.name} 装备方案"
-            stage.scene = Scene(EquipPane(type))
-            stage.setOnCloseRequest {
-                (stage.scene.root as EquipPane).customEquips.copyInto(type.equips)
-                equipsButton.text = type.equips.joinToString { id -> Equip.idMap[id]!!.name }
-                updateChart()
-            }
-            stage.show()
+            val pane = EquipPane(type)
+            startStage("${type.name} 装备方案", pane)
+            pane.customEquips.copyInto(type.equips)
+            equipsButton.text = type.equips.joinToString { id -> Equip.idMap[id]!!.name }
+            updateChart()
         }
 
         val runesButton = Button(type.runes.map { "${Rune.idMap[it.key]?.name} x ${it.value}" }.joinToString("\n"))
         runesButton.setOnAction {
-            RuneStage(type) {
-                runesButton.text = type.runes.map { "${Rune.idMap[it.key]?.name} x ${it.value}" }.joinToString("\n")
-                updateChart()
-            }
+            startStage("${type.name} 铭文方案", RunePane(type))
+            runesButton.text = type.runes.map { "${Rune.idMap[it.key]?.name} x ${it.value}" }.joinToString("\n")
+            updateChart()
         }
 
         padding = Insets(4.0)

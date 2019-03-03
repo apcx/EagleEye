@@ -1,21 +1,22 @@
 package apc.eagle.fx
 
-import apc.eagle.common.Equip
-import apc.eagle.common.Hero
-import apc.eagle.common.HeroType
+import apc.common.center
+import apc.common.plus
+import apc.common.startStage
+import apc.eagle.common.*
 import javafx.beans.property.SimpleStringProperty
 import javafx.beans.value.ObservableValue
 import javafx.event.EventHandler
 import javafx.geometry.Insets
 import javafx.geometry.Pos
-import javafx.scene.Scene
 import javafx.scene.control.*
 import javafx.scene.control.cell.PropertyValueFactory
 import javafx.scene.input.MouseEvent
 import javafx.scene.layout.HBox
 import javafx.scene.layout.VBox
-import javafx.stage.Stage
+import javafx.scene.paint.Color
 import javafx.util.Callback
+import kotlin.reflect.KCallable
 
 class SolutionPane : VBox() {
 
@@ -24,15 +25,14 @@ class SolutionPane : VBox() {
     init {
         val nameColumn = TableColumn<HeroType, String>("英雄")
         nameColumn.cellValueFactory = PropertyValueFactory<HeroType, String>(HeroType::name.name)
+        nameColumn.center()
 
         val equipColumns = Array(6) { index ->
             val column = TableColumn<HeroType, String>()
             column.cellValueFactory = Callback { SimpleStringProperty(Equip.idMap[it.value.equips[index]]?.name) }
+            column.center()
             column
         }
-
-        val runesColumn = TableColumn<HeroType, String>("铭文")
-        runesColumn.cellValueFactory = PropertyValueFactory<HeroType, String>(HeroType::runes.name)
 
         val speedColumn = TableColumn<HeroType, String>("攻击速度 - 帧数")
         speedColumn.cellValueFactory =
@@ -50,18 +50,23 @@ class SolutionPane : VBox() {
                     }
                 }
             }
+        speedColumn.center()
 
         val tableView = TableView<HeroType>()
-        tableView.columns.setAll(nameColumn, *equipColumns, runesColumn, speedColumn)
+        tableView.columns.setAll(
+            nameColumn, *equipColumns,
+            column(HeroType::blueRunes, 2),
+            column(HeroType::greenRunes, 3),
+            column(HeroType::redRunes, 1),
+            speedColumn
+        )
+        tableView.columnResizePolicy = TableView.UNCONSTRAINED_RESIZE_POLICY
         tableView.setRowFactory {
             val row = TableRow<HeroType>()
             row.onMouseClicked = EventHandler<MouseEvent> { event ->
                 if (event.clickCount == 2) {
                     val type = row.item
-                    val stage = Stage()
-                    stage.title = "${type.name} 攻速档位"
-                    stage.scene = Scene(DetailPane(type))
-                    stage.show()
+                    startStage("${type.name} 攻速档位", DetailPane(type))
                 }
             }
             row
@@ -69,10 +74,13 @@ class SolutionPane : VBox() {
 
         group.selectedToggleProperty().addListener { _, _, newValue ->
             val category = newValue.userData.toString()
-            var heroes = HeroType.idMap.values.toList()
-            if (category != "全部") heroes = heroes.filter { it.category == category || it.secondaryCategory == category }
-            heroes.sortedBy { it.order }.forEach { it.initSpeeds() }
-            tableView.items.setAll(heroes)
+            var types = HeroType.idMap.values.toList()
+            if (category != "全部") types = types.filter { it.category == category || it.secondaryCategory == category }
+            types.sortedBy { it.order }.forEach {
+                it.resetRunes()
+                it.initSpeeds()
+            }
+            tableView.items.setAll(types)
         }
 
         val tabs = HBox(2.0)
@@ -89,5 +97,28 @@ class SolutionPane : VBox() {
         userData = category
         toggleGroup = group
         isSelected = selected
+    }
+
+
+    private fun column(property: KCallable<*>, color: Int) = TableColumn<HeroType, Map<Int, Int>>().apply {
+        cellValueFactory = PropertyValueFactory<HeroType, Map<Int, Int>>(property.name)
+        setCellFactory { RuneConfigCell(color) }
+    }
+}
+
+private class RuneConfigCell(color: Int) : TableCell<HeroType, Map<Int, Int>>() {
+
+    init {
+        alignment = Pos.CENTER
+        when (color) {
+            Rune.RED -> textFill = Color.DARKRED
+            Rune.BLUE -> textFill = Color.MIDNIGHTBLUE
+            Rune.GREEN -> textFill = Color.DARKGREEN
+        }
+    }
+
+    override fun updateItem(item: Map<Int, Int>?, empty: Boolean) {
+        super.updateItem(item, empty)
+        text = item?.map { "${it.key.toRune()?.name} x ${it.value}" }?.joinToString("\n")
     }
 }
