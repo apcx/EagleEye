@@ -41,6 +41,16 @@ fun Node.setCopyable() = apply {
     }
 }
 
+fun <T : Any> Node.setCopyString(stringify: T.() -> Any? = { this }) {
+    setOnDragDetected {
+        @Suppress("UNCHECKED_CAST") val content = (userData as? T)?.stringify()
+//        if (!content.isNullOrEmpty()) {
+//            startDragAndDrop(TransferMode.COPY).setContent(ClipboardContent().apply { putString(content) })
+//            it.consume()
+//        }
+    }
+}
+
 fun Node.onCopy(check: (String, Boolean) -> Boolean) {
     setOnDragOver {
         if (it.gestureSource != this && it.dragboard.hasString() && check(it.dragboard.string, false))

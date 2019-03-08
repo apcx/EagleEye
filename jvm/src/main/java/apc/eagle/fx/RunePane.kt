@@ -5,11 +5,14 @@ import apc.common.plus
 import apc.eagle.common.HeroType
 import apc.eagle.common.Rune
 import apc.eagle.common.RuneConfig
+import apc.eagle.common.toRune
 import javafx.event.EventHandler
 import javafx.geometry.Insets
 import javafx.geometry.Pos
 import javafx.scene.control.*
 import javafx.scene.control.cell.PropertyValueFactory
+import javafx.scene.image.Image
+import javafx.scene.image.ImageView
 import javafx.scene.input.MouseEvent
 import javafx.scene.layout.BorderPane
 import javafx.scene.layout.HBox
@@ -24,18 +27,36 @@ class RunePane(type: HeroType) : BorderPane() {
         val redPane = ColorRunePane(type, Rune.RED)
 
         val blue = type.blueRunes.keys.first()
+        val blueRune = Rune.idMap[blue]!!
         bluePane.button.userData = blue
-        bluePane.button.text = Rune.idMap[blue]?.name
+        bluePane.button.text = blueRune.name
+        bluePane.button.graphic = ImageView(Image("rune/${blueRune.id}.png")).apply {
+            fitWidth = 50.0
+            fitHeight = 50.0
+            isSmooth = true
+        }
 
         val green = type.greenRunes.keys.first()
+        val greenRune = Rune.idMap[green]!!
         greenPane.button.userData = green
-        greenPane.button.text = Rune.idMap[green]?.name
+        greenPane.button.text = greenRune.name
+        greenPane.button.graphic = ImageView(Image("rune/${greenRune.id}.png")).apply {
+            fitWidth = 50.0
+            fitHeight = 50.0
+            isSmooth = true
+        }
 
         val red = type.redRunes.keys.first()
+        val redRune = Rune.idMap[red]!!
         redPane.button.userData = red
-        redPane.button.text = Rune.idMap[red]?.name
+        redPane.button.text = redRune.name
+        redPane.button.graphic = ImageView(Image("rune/${redRune.id}.png")).apply {
+            fitWidth = 50.0
+            fitHeight = 50.0
+            isSmooth = true
+        }
 
-        val nameColumn = TableColumn<RuneConfig, String>("系统推荐")
+        val nameColumn = TableColumn<RuneConfig, String>("双击使用")
         nameColumn.cellValueFactory = PropertyValueFactory<RuneConfig, String>(RuneConfig::name.name)
         nameColumn.center()
 
@@ -51,9 +72,15 @@ class RunePane(type: HeroType) : BorderPane() {
             row.onMouseClicked = EventHandler<MouseEvent> {
                 if (it.clickCount == 2) {
                     val config = row.item
-                    Rune.idMap[config.blue]?.copyTo(bluePane.button)
-                    Rune.idMap[config.green]?.copyTo(greenPane.button)
-                    Rune.idMap[config.red]?.copyTo(redPane.button)
+                    val redRune = config.red.toRune()!!
+                    val blueRune = config.blue.toRune()!!
+                    val greenRune = config.green.toRune()!!
+                    redRune.copyTo(redPane.button)
+                    blueRune.copyTo(bluePane.button)
+                    greenRune.copyTo(greenPane.button)
+                    (redPane.button.graphic as ImageView).image = Image("rune/${redRune.id}.png")
+                    (bluePane.button.graphic as ImageView).image = Image("rune/${blueRune.id}.png")
+                    (greenPane.button.graphic as ImageView).image = Image("rune/${greenRune.id}.png")
                 }
             }
             row

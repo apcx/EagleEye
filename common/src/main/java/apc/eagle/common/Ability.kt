@@ -9,7 +9,7 @@ class Ability {
     var slot = 0
     var cd = 0
 
-    override fun toString() = json
+    override fun toString() = toJson()
 
     companion object : HashMap<Int, Ability>()
 }

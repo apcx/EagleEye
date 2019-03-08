@@ -26,7 +26,7 @@ class Rune {
     var magicDrain = 0
     var moveSpeed = 0
 
-    override fun toString() = json
+    override fun toString() = toJson()
 
     companion object {
         const val RED = 1

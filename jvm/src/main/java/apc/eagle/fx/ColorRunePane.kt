@@ -1,6 +1,5 @@
 package apc.eagle.fx
 
-import apc.common.IntSlider
 import apc.common.onCopy
 import apc.common.plus
 import apc.common.setCopyable
@@ -8,10 +7,10 @@ import apc.eagle.common.HeroType
 import apc.eagle.common.Rune
 import apc.eagle.common.toRune
 import javafx.geometry.Insets
-import javafx.geometry.Orientation
 import javafx.geometry.Pos
 import javafx.scene.Node
 import javafx.scene.control.Button
+import javafx.scene.image.Image
 import javafx.scene.image.ImageView
 import javafx.scene.layout.BorderPane
 import javafx.scene.layout.TilePane
@@ -36,7 +35,10 @@ class ColorRunePane(private val hero: HeroType, private val color: Int) : Border
             if (rune == null || rune.color != color) {
                 false
             } else {
-                if (drop) rune copyTo button
+                if (drop) {
+                    rune copyTo button
+                    (button.graphic as ImageView).image = Image("rune/${rune.id}.png")
+                }
                 true
             }
         }
@@ -87,13 +89,14 @@ class ColorRunePane(private val hero: HeroType, private val color: Int) : Border
             } else {
                 val button = Button(rune.name).setCopyable()
                 button.userData = rune.id
+//                button.setCopyString<Rune> { id.toString() }
                 pane + button
             }
         }
         return pane
     }
 
-    private fun initSlider(): Node {
+    private fun initCurrentRunes(): Node {
         val map = hero.neoRunes[color - 1].toList()
         val buttons = Array(2) {
             Button().apply {
@@ -107,14 +110,8 @@ class ColorRunePane(private val hero: HeroType, private val color: Int) : Border
         val button1 = Button()
         val button2 = Button()
         val vBox = VBox(2.0).apply { alignment = Pos.CENTER } + button1 + button2
-        val slider = IntSlider(0, 10) {
-
-        }
-        slider.orientation = Orientation.VERTICAL
-        slider.prefHeight = 180.0
 
         val pane = BorderPane()
-        pane.right = slider
         pane.center = vBox
         return pane
     }

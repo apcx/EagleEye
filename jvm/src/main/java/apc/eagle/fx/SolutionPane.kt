@@ -28,7 +28,7 @@ class SolutionPane : VBox() {
         nameColumn.center()
 
         val equipColumns = Array(6) { index ->
-            val column = TableColumn<HeroType, String>()
+            val column = TableColumn<HeroType, String>((1 + index).toString())
             column.cellValueFactory = Callback { SimpleStringProperty(Equip.idMap[it.value.equips[index]]?.name) }
             column.center()
             column

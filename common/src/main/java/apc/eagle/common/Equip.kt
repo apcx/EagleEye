@@ -18,7 +18,7 @@ class Equip {
     var magicDefense = 0
     var moveSpeed = 0
 
-    override fun toString() = json
+    override fun toString() = toJson()
 
     companion object {
         val idMap = mutableMapOf<Int, Equip>()

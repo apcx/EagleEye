@@ -62,7 +62,7 @@ open class HeroType : UnitType() {
 
     open fun attackFrames(speed: Int) = SpeedModel[speedModel]?.frames(speed) ?: speedFrames(attackCd, speed) + swing
 
-    override fun toString() = json
+    override fun toString() = toJson()
 
     companion object {
         val idMap = mutableMapOf<Int, HeroType>()
@@ -93,4 +93,5 @@ open class HeroType : UnitType() {
 
 @Suppress("SpellCheckingInspection")
 private val gson = Gson()
-val Any?.json get() = gson.toJson(this)!!
+
+fun Any?.toJson() = gson.toJson(this)!!
