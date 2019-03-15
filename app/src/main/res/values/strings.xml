@@ -2,4 +2,5 @@
     <string name="app_name">鹰眼</string>
     <string name="days">/30 天</string>
     <string name="exp">"经验值 "</string>
+    <string name="weeks">" 周"</string>
 </resources>

@@ -88,7 +88,7 @@ class HeroInfo : BaseRowModel() {
         type.bonusDefense = bonusDefense
         type.defaultRuneConfig = runeConfig
 
-        if (name == "后羿" || name == "狄仁杰") type.passiveSpeed = 300
+        if (name == "狄仁杰") type.passiveSpeed = 300
         return type
     }
 
