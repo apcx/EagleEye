@@ -86,13 +86,15 @@ class EquipPane(type: HeroType) : BorderPane() {
         rightBox.alignment = Pos.BOTTOM_CENTER
 
         bottom = customEquipButtons
-        left = VBox(2.0).apply { padding = Insets(2.0) } +
-                addCategory("攻击", 1) +
-                addCategory("法术", 2) +
-                addCategory("防御", 3) +
-                addCategory("移动", 4) +
-                addCategory("打野", 5) +
-                addCategory("辅助", 7)
+        left = VBox(
+            2.0,
+            addCategory("攻击", 1),
+            addCategory("法术", 2),
+            addCategory("防御", 3),
+            addCategory("移动", 4),
+            addCategory("打野", 5),
+            addCategory("辅助", 7)
+        ).apply { padding = Insets(2.0) }
         right = rightBox + saveButton
         center = tilePane
     }

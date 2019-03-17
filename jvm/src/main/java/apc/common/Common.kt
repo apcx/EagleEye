@@ -3,6 +3,7 @@ package apc.common
 import javafx.scene.Node
 import javafx.scene.Parent
 import javafx.scene.Scene
+import javafx.scene.control.Labeled
 import javafx.scene.control.TableColumn
 import javafx.scene.input.ClipboardContent
 import javafx.scene.input.TransferMode
@@ -34,32 +35,24 @@ fun Node.startStage(title: String, root: Parent) {
 
 inline operator fun <reified T : Pane> T.plus(node: Node) = apply { children += node }
 
-fun Node.setCopyable() = apply {
-    setOnDragDetected {
-        startDragAndDrop(TransferMode.COPY).setContent(ClipboardContent().apply { putString(userData.toString()) })
-        it.consume()
-    }
-}
-
-fun <T : Any> Node.setCopyString(stringify: T.() -> Any? = { this }) {
-    setOnDragDetected {
-        @Suppress("UNCHECKED_CAST") val content = (userData as? T)?.stringify()
-//        if (!content.isNullOrEmpty()) {
-//            startDragAndDrop(TransferMode.COPY).setContent(ClipboardContent().apply { putString(content) })
-//            it.consume()
-//        }
+fun Labeled.copyable() = apply {
+    if (text.isNotEmpty()) {
+        setOnDragDetected {
+            it.consume()
+            startDragAndDrop(TransferMode.COPY).setContent(ClipboardContent().apply { putString(text) })
+        }
     }
 }
 
 fun Node.onCopy(check: (String, Boolean) -> Boolean) {
     setOnDragOver {
+        it.consume()
         if (it.gestureSource != this && it.dragboard.hasString() && check(it.dragboard.string, false))
             it.acceptTransferModes(TransferMode.COPY)
-        it.consume()
     }
     setOnDragDropped {
-        it.isDropCompleted = it.dragboard.hasString() && check(it.dragboard.string, true)
         it.consume()
+        it.isDropCompleted = it.dragboard.hasString() && check(it.dragboard.string, true)
     }
 }
 

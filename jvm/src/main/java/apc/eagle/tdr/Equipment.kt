@@ -24,6 +24,9 @@ class Equipment : BaseRowModel() {
     @ExcelProperty(index = 7)
     var category = 0
 
+    @ExcelProperty(index = 10)
+    var level = 0
+
     @ExcelProperty(index = 19)
     var price = 0
 
@@ -94,7 +97,7 @@ class Equipment : BaseRowModel() {
                 val type = row.toType()
                 Equip.idMap[row.id] = type
                 Equip.nameMap[row.name] = type
-                println(type)
+                println(row)
             }
         }
     }

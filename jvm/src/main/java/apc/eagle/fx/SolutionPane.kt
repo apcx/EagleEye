@@ -3,7 +3,11 @@ package apc.eagle.fx
 import apc.common.center
 import apc.common.plus
 import apc.common.startStage
-import apc.eagle.common.*
+import apc.eagle.common.Equip
+import apc.eagle.common.Hero
+import apc.eagle.common.HeroType
+import apc.eagle.common.Rune
+import apc.eagle.fx.rune.RuneCell
 import javafx.beans.property.SimpleStringProperty
 import javafx.beans.value.ObservableValue
 import javafx.event.EventHandler
@@ -14,9 +18,7 @@ import javafx.scene.control.cell.PropertyValueFactory
 import javafx.scene.input.MouseEvent
 import javafx.scene.layout.HBox
 import javafx.scene.layout.VBox
-import javafx.scene.paint.Color
 import javafx.util.Callback
-import kotlin.reflect.KCallable
 
 class SolutionPane : VBox() {
 
@@ -53,20 +55,17 @@ class SolutionPane : VBox() {
         speedColumn.center()
 
         val tableView = TableView<HeroType>()
-        tableView.columns.setAll(
-            nameColumn, *equipColumns,
-            column(HeroType::blueRunes, 2),
-            column(HeroType::greenRunes, 3),
-            column(HeroType::redRunes, 1),
-            speedColumn
-        )
         tableView.columnResizePolicy = TableView.UNCONSTRAINED_RESIZE_POLICY
+        tableView.columns.setAll(
+            nameColumn, *equipColumns, column(Rune.BLUE), column(Rune.GREEN), column(Rune.RED), speedColumn
+        )
         tableView.setRowFactory {
             val row = TableRow<HeroType>()
             row.onMouseClicked = EventHandler<MouseEvent> { event ->
                 if (event.clickCount == 2) {
                     val type = row.item
-                    startStage("${type.name} 攻速档位", DetailPane(type))
+                    startStage("${type.name} 攻速档位", HeroPane(type))
+                    tableView.refresh()
                 }
             }
             row
@@ -76,11 +75,8 @@ class SolutionPane : VBox() {
             val category = newValue.userData.toString()
             var types = HeroType.idMap.values.toList()
             if (category != "全部") types = types.filter { it.category == category || it.secondaryCategory == category }
-            types.sortedBy { it.order }.forEach {
-                it.resetRunes()
-                it.initSpeeds()
-            }
-            tableView.items.setAll(types)
+            types.forEach { it.initSpeeds() }
+            tableView.items.setAll(types.sortedBy { it.order })
         }
 
         val tabs = HBox(2.0)
@@ -99,26 +95,8 @@ class SolutionPane : VBox() {
         isSelected = selected
     }
 
-
-    private fun column(property: KCallable<*>, color: Int) = TableColumn<HeroType, Map<Int, Int>>().apply {
-        cellValueFactory = PropertyValueFactory<HeroType, Map<Int, Int>>(property.name)
-        setCellFactory { RuneConfigCell(color) }
-    }
-}
-
-private class RuneConfigCell(color: Int) : TableCell<HeroType, Map<Int, Int>>() {
-
-    init {
-        alignment = Pos.CENTER
-        when (color) {
-            Rune.RED -> textFill = Color.DARKRED
-            Rune.BLUE -> textFill = Color.MIDNIGHTBLUE
-            Rune.GREEN -> textFill = Color.DARKGREEN
-        }
-    }
-
-    override fun updateItem(item: Map<Int, Int>?, empty: Boolean) {
-        super.updateItem(item, empty)
-        text = item?.map { "${it.key.toRune()?.name} x ${it.value}" }?.joinToString("\n")
+    private fun column(color: Int) = TableColumn<HeroType, String>().apply {
+        setCellValueFactory { SimpleStringProperty(it.value.runeConfig.toString(color)) }
+        setCellFactory { RuneCell(color) }
     }
 }

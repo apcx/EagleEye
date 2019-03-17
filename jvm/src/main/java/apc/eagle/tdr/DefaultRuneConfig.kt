@@ -28,9 +28,10 @@ class DefaultRuneConfig : BaseRowModel() {
     fun toType() = RuneConfig().also {
         it.id = id
         it.name = "系统 - $name"
-        it.red = red
-        it.blue = blue
-        it.green = green
+        it.ids[0][RuneInfo.level5Runes[red]!!] = 10
+        it.ids[1][RuneInfo.level5Runes[blue]!!] = 10
+        it.ids[2][RuneInfo.level5Runes[green]!!] = 10
+        RuneConfig[id] = it
     }
 
     override fun toString() = Json.stringify(serializer, this)
@@ -40,10 +41,7 @@ class DefaultRuneConfig : BaseRowModel() {
         override val table = 2
         private val serializer = DefaultRuneConfig.serializer()
         override fun invoke(row: DefaultRuneConfig, context: AnalysisContext) {
-            row.red = RuneInfo.level5Runes[row.red]!!
-            row.blue = RuneInfo.level5Runes[row.blue]!!
-            row.green = RuneInfo.level5Runes[row.green]!!
-            RuneConfig[row.id] = row.toType()
+            row.toType()
             println(row)
         }
     }

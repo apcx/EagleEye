@@ -12,10 +12,9 @@ class Hero(val type: HeroType) {
         type.equips.map(Equip.idMap::get).filterNotNull().forEach {
             baseAttackSpeed += it.attackSpeed
         }
-        type.runes.forEach { id, count ->
-            val rune = Rune.idMap[id]!!
-            baseAttackSpeed += rune.attackSpeed * count
-        }
+
+        val rune = type.runeConfig.toOneRune()
+        baseAttackSpeed += rune.attackSpeed
     }
 
     val expectedSpeed get() = min(baseAttackSpeed + type.passiveSpeed, 2000)

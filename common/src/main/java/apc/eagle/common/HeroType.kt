@@ -2,7 +2,6 @@ package apc.eagle.common
 
 import apc.eagle.common.GameData.MS_FRAME
 import com.google.gson.Gson
-import java.util.*
 
 open class HeroType : UnitType() {
 
@@ -18,11 +17,7 @@ open class HeroType : UnitType() {
     val equips = IntArray(6)
     var defaultRuneConfig = 0
     val recommendedRuneConfigs = mutableListOf<RuneConfig>()
-    val redRunes = mutableMapOf<Int, Int>()
-    val blueRunes = mutableMapOf<Int, Int>()
-    val greenRunes = mutableMapOf<Int, Int>()
-    val runes get() = mutableMapOf<Int, Int>() + redRunes + blueRunes + greenRunes
-    val neoRunes = Array<SortedMap<Int, Int>>(3) { sortedMapOf() }
+    val runeConfig = RuneConfig()
     val abilities = IntArray(4)
 
     var speedModel = 0
@@ -40,20 +35,7 @@ open class HeroType : UnitType() {
     }
 
     fun resetRunes() {
-        val config = RuneConfig[defaultRuneConfig]!!
-        redRunes.clear()
-        blueRunes.clear()
-        greenRunes.clear()
-        redRunes[config.red] = 10
-        blueRunes[config.blue] = 10
-        greenRunes[config.green] = 10
-
-        neoRunes[0].clear()
-        neoRunes[1].clear()
-        neoRunes[2].clear()
-        neoRunes[0][config.red] = 10
-        neoRunes[1][config.blue] = 10
-        neoRunes[2][config.green] = 10
+        RuneConfig[defaultRuneConfig]?.copyTo(runeConfig)
     }
 
     fun initSpeeds() {

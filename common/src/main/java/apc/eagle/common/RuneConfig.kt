@@ -7,20 +7,30 @@ class RuneConfig {
     var id = 0
     var name = ""
     var hero = 0
-    var red = 0
-    var blue = 0
-    var green = 0
+    val ids = Array(3) { linkedMapOf<Int, Int>() }
 
-    override fun equals(other: Any?) = other is RuneConfig
-            && other.red == red
-            && other.blue == blue
-            && other.green == green
+    fun toRunes(color: Int) = mutableListOf<Pair<Rune, Int>>().apply {
+        ids[color - 1].forEach { id, count ->
+            val rune = id.toRune()
+            if (rune != null && count > 0) add(rune to count)
+        }
+    }
 
-    override fun hashCode(): Int {
-        var result = red
-        result = 31 * result + blue
-        result = 31 * result + green
-        return result
+    fun toString(color: Int) = toRunes(color).joinToString("\n") { "${it.first.name} x ${it.second}" }
+
+    fun toOneRune() = Rune().apply {
+        val runes = mutableListOf<Pair<Rune, Int>>()
+        repeat(3) { runes += toRunes(1 + it) }
+        runes.forEach {
+            attackSpeed += it.first.attackSpeed * it.second
+        }
+    }
+
+    fun copyTo(target: RuneConfig) {
+        target.ids.forEachIndexed { index, it ->
+            it.clear()
+            it.putAll(ids[index])
+        }
     }
 
     companion object : TreeMap<Int, RuneConfig>()
