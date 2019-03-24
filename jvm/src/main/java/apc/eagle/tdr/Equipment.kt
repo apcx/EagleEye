@@ -1,5 +1,7 @@
 package apc.eagle.tdr
 
+import apc.common.copyTo
+import apc.common.plus
 import apc.eagle.common.Equip
 import com.alibaba.excel.annotation.ExcelProperty
 import com.alibaba.excel.context.AnalysisContext
@@ -7,6 +9,7 @@ import com.alibaba.excel.metadata.BaseRowModel
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 import kotlinx.serialization.json.Json
+import java.nio.file.Paths
 
 @Serializable
 class Equipment : BaseRowModel() {
@@ -99,6 +102,18 @@ class Equipment : BaseRowModel() {
                 Equip.nameMap[row.name] = type
                 println(row)
             }
+        }
+
+        override fun doAfterAllAnalysed(context: AnalysisContext) {
+//            copyResources()
+        }
+
+        @Suppress("unused")
+        private fun copyResources() {
+            val icon = Paths.get("D:\\Kings\\trunk\\UI\\5_Dynamic\\Icon")
+            val res = Paths.get("resources")
+            res.toFile().mkdirs()
+            Equip.idMap.keys.forEach { icon + "$it.png" copyTo res + "equip" }
         }
     }
 }

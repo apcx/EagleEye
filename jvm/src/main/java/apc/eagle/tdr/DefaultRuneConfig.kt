@@ -26,7 +26,6 @@ class DefaultRuneConfig : BaseRowModel() {
     var green = 0
 
     fun toType() = RuneConfig().also {
-        it.id = id
         it.name = "系统 - $name"
         it.ids[0][RuneInfo.level5Runes[red]!!] = 10
         it.ids[1][RuneInfo.level5Runes[blue]!!] = 10

@@ -13,25 +13,17 @@ open class HeroType : UnitType() {
     var bonusAttack = 0
     var bonusAttackSpeed = 0
     var bonusDefense = 0
-    val defaultEquips = Array(3) { IntArray(6) }
+    val equipConfigs = Array<EquipConfig?>(6) { null }
     val equips = IntArray(6)
     var defaultRuneConfig = 0
     val recommendedRuneConfigs = mutableListOf<RuneConfig>()
     val runeConfig = RuneConfig()
+    val attackAbilities = mutableListOf<Ability>()
     val abilities = IntArray(4)
-
-    var speedModel = 0
-    var swing = 2
-    lateinit var speeds: IntArray
     var passiveSpeed = 0
 
-    fun useDefaultEquips(index: Int = 0) {
-        defaultEquips[index].copyInto(equips)
-    }
-
-    fun setEquips(vararg names: String) {
-        equips.fill(0)
-        names.mapNotNull(Equip.nameMap::get).map { it.id }.toIntArray().copyInto(equips)
+    fun applyEquipConfig(index: Int = 0) {
+        equipConfigs[index]?.equips?.copyInto(equips)
     }
 
     fun resetRunes() {
@@ -39,10 +31,10 @@ open class HeroType : UnitType() {
     }
 
     fun initSpeeds() {
-        if (!::speeds.isInitialized) speeds = buildSpeeds(attackCd)
+        attackAbilities.forEach(Ability::initSpeeds)
     }
 
-    open fun attackFrames(speed: Int) = SpeedModel[speedModel]?.frames(speed) ?: speedFrames(attackCd, speed) + swing
+    open fun attackFrames(speed: Int, index: Int = 0) = attackAbilities[index].attackFrames(speed)
 
     override fun toString() = toJson()
 
@@ -55,20 +47,6 @@ open class HeroType : UnitType() {
             var frames = ms / MS_FRAME
             if (ms % MS_FRAME != 0) ++frames
             return frames
-        }
-
-        fun buildSpeeds(cd: Int, max: Int = 200): IntArray {
-            val list = mutableListOf<Int>()
-            var old = speedFrames(cd, 0)
-            repeat(max * 10 - 1) {
-                val speed = 1 + it
-                val frames = speedFrames(cd, speed)
-                if (old != frames) {
-                    old = frames
-                    list += speed
-                }
-            }
-            return list.toIntArray()
         }
     }
 }

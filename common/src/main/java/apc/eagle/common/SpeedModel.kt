@@ -27,13 +27,13 @@ class SpeedModel(val swing: Int = 2) {
         }
 
         fun initHeroes() {
-            forEach { id, speedModel ->
-                speedModel.heroes.mapNotNull(HeroType.nameMap::get).forEach {
-                    if (speedModel::speeds.isInitialized) {
-                        it.speedModel = id
-                        it.speeds = speedModel.speeds
+            forEach { id, model ->
+                model.heroes.mapNotNull(HeroType.nameMap::get).forEach {
+                    if (model::speeds.isInitialized) {
+                        it.attackAbilities[0].speedModel = id
+                        it.attackAbilities[0].speeds = model.speeds
                     } else {
-                        it.swing = speedModel.swing
+                        it.attackAbilities[0].swing = model.swing
                     }
                 }
             }

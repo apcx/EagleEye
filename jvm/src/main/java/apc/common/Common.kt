@@ -12,9 +12,16 @@ import javafx.stage.Modality
 import javafx.stage.Stage
 import javafx.stage.StageStyle
 import javafx.stage.Window
+import java.nio.file.Files
 import java.nio.file.Path
+import java.nio.file.StandardCopyOption
 
 operator fun Path.plus(other: String) = resolve(other)!!
+operator fun Path.plus(other: Path) = resolve(other)!!
+
+infix fun Path.copyTo(directory: Path) {
+    Files.copy(this, directory + fileName, StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.COPY_ATTRIBUTES)
+}
 
 val Node.stage get() = scene.window!!
 
@@ -44,7 +51,7 @@ fun Labeled.copyable() = apply {
     }
 }
 
-fun Node.onCopy(check: (String, Boolean) -> Boolean) {
+fun Node.onCopy(check: (string: String, drop: Boolean) -> Boolean) {
     setOnDragOver {
         it.consume()
         if (it.gestureSource != this && it.dragboard.hasString() && check(it.dragboard.string, false))

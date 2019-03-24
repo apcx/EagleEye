@@ -5,7 +5,9 @@ import javafx.scene.control.Button
 import javafx.scene.image.Image
 import javafx.scene.image.ImageView
 
-class RuneButton() : Button("（无）", ImageView().apply { isSmooth = true }) {
+private const val NO_RUNE = "（拖动到这里）"
+
+class RuneButton() : Button(NO_RUNE, ImageView().apply { isSmooth = true }) {
 
     var rune: Rune? = null
         set(value) {
@@ -32,7 +34,7 @@ class RuneButton() : Button("（无）", ImageView().apply { isSmooth = true }) 
         val imageView = graphic as ImageView
         val rune = this.rune
         if (rune == null) {
-            text = "（无）"
+            text = NO_RUNE
             imageView.image = null
             imageView.fitWidth = 0.0
             imageView.fitHeight = 0.0

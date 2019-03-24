@@ -111,9 +111,7 @@ class RecommendedRuneConfig : BaseRowModel() {
     var green10 = 0
 
     fun toType() = RuneConfig().also {
-        it.id = id
         it.name = name
-        it.hero = hero
         it.ids[0].addRune(red1, red2, red3, red4, red5, red6, red7, red8, red9, red10)
         it.ids[1].addRune(blue1, blue2, blue3, blue4, blue5, blue6, blue7, blue8, blue9, blue10)
         it.ids[2].addRune(green1, green2, green3, green4, green5, green6, green7, green8, green9, green10)

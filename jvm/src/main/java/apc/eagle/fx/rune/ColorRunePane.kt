@@ -6,7 +6,6 @@ import apc.common.plus
 import apc.eagle.common.HeroType
 import apc.eagle.common.Rune
 import apc.eagle.common.RuneConfig
-import apc.eagle.common.toRune
 import javafx.geometry.Insets
 import javafx.geometry.Pos
 import javafx.scene.control.Button
@@ -30,10 +29,10 @@ internal class ColorRunePane(private val hero: HeroType, private val color: Int)
         bottom = initCurrentRunes()
     }
 
-    private fun allRunes(tile: Boolean = false) = TilePane(2.0, 2.0).apply {
+    private fun allRunes(includeAlpha: Boolean = false) = TilePane(2.0, 2.0).apply {
         prefColumns = 3
-        if (tile) {
-            Rune.idMap.values.filter { it.color == color && it.level == 5 }
+        if (includeAlpha) {
+            Rune.idMap.values.filter { it.color == color && it.level == 5 }.map { it.name }
         } else {
             when (color) {
                 Rune.RED -> {
@@ -58,16 +57,16 @@ internal class ColorRunePane(private val hero: HeroType, private val color: Int)
                     "", "回声"
                 )
                 else -> listOf()
-            }.map(String::toRune)
-        }.forEach { this + (if (it == null) Text() else Button(it.name).copyable()) }
+            }
+        }.forEach { this + (if (it.isEmpty()) Text() else Button(it).copyable()) }
     }
 
     private fun initCurrentRunes() = VBox(2.0, *buttons).apply {
         padding = Insets(4.0, 0.0, 0.0, 0.0)
         alignment = Pos.BOTTOM_CENTER
         buttons.forEachIndexed { index, button ->
-            button.onCopy { name, drop ->
-                val rune = Rune.nameMap[name]
+            button.onCopy { string, drop ->
+                val rune = Rune.nameMap[string]
                 if (rune == null || rune.color != color || rune == buttons[0].rune || rune == buttons[1].rune) {
                     false
                 } else {
@@ -89,7 +88,7 @@ internal class ColorRunePane(private val hero: HeroType, private val color: Int)
         }
     }
 
-    internal fun setConfig(config: RuneConfig) {
+    internal fun applyConfig(config: RuneConfig) {
         buttons[1].rune = null
         buttons[1].count = 0
         config.toRunes(color).forEachIndexed { index, it ->

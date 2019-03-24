@@ -38,14 +38,13 @@ class AbilityInfo : BaseRowModel() {
         override fun invoke(row: AbilityInfo, context: AnalysisContext) {
             val heroId = row.id / 100
             HeroType.idMap[heroId]?.run {
-                if (row.id == heroId * 100)
-                    attackCd = row.cd
-                else if (row.slot > 0)
-                    abilities[row.slot - 1] = row.id
-
                 val type = row.toType()
                 Ability[row.id] = type
                 println(type)
+                if (row.id == heroId * 100)
+                    attackAbilities += type
+                else if (row.slot > 0)
+                    abilities[row.slot - 1] = row.id
             }
         }
     }

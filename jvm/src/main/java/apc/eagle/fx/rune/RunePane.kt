@@ -36,7 +36,7 @@ class RunePane(hero: HeroType) : HBox() {
             row.setOnMouseClicked { event ->
                 if (event.clickCount == 2) {
                     val config = row.item
-                    colorPanes.forEach { it.setConfig(config) }
+                    colorPanes.forEach { it.applyConfig(config) }
                 }
             }
             row

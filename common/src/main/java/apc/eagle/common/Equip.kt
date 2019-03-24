@@ -1,5 +1,8 @@
 package apc.eagle.common
 
+fun Int.toEquip() = Equip.idMap[this]
+fun String.toEquip() = Equip.nameMap[this]
+
 class Equip {
 
     var id = 0
@@ -21,6 +24,12 @@ class Equip {
     override fun toString() = toJson()
 
     companion object {
+        const val CATEGORY_ATTACK = 1
+        const val CATEGORY_MAGIC = 2
+        const val CATEGORY_DEFENSE = 3
+        const val CATEGORY_MOVE = 4
+        const val CATEGORY_MOB = 5
+        const val CATEGORY_SUPPORT = 7
         val idMap = mutableMapOf<Int, Equip>()
         val nameMap = mutableMapOf<String, Equip>()
     }

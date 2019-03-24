@@ -1,10 +1,9 @@
 package apc.eagle.tdr
 
+import apc.common.copyTo
 import apc.common.plus
 import apc.eagle.common.SpeedModel
-import java.nio.file.Files
 import java.nio.file.Paths
-import java.nio.file.StandardCopyOption
 
 fun main(args: Array<String>) {
     if (args.isNotEmpty()) Tdr.root = Paths.get(args[0])
@@ -23,6 +22,7 @@ object Tdr {
         HeroEnable.load()
         HeroInfo.load()
         DefaultEquipments.load()
+        ProEquipments.load()
         RecommendedRuneConfig.load()
         AbilityInfo.load()
         SpeedModel.initHeroes()
@@ -33,14 +33,6 @@ object Tdr {
         val icon = Paths.get("D:\\Kings\\trunk\\UI\\5_Dynamic\\Icon")
         val res = Paths.get("resources")
         res.toFile().mkdirs()
-        HeroEnable.ids.forEach {
-            val name = "30${it}0.png"
-            Files.copy(
-                icon + name,
-                res + "hero" + name,
-                StandardCopyOption.REPLACE_EXISTING,
-                StandardCopyOption.COPY_ATTRIBUTES
-            )
-        }
+        HeroEnable.ids.forEach { icon + "30${it}0.png" copyTo res + "hero" }
     }
 }

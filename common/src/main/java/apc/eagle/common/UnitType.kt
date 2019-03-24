@@ -9,5 +9,4 @@ open class UnitType {
     var baseAttack = 0
     var baseDefense = 0
     var baseMove = 0
-    var attackCd = 1000
 }

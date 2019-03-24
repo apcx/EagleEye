@@ -9,5 +9,6 @@ class Hero169 : HeroType() { // 后羿
         passiveSpeed = 300
     }
 
-    override fun attackFrames(speed: Int) = if (speed < 30) 16 else 12 - speeds.indexOfLast { speed >= it }
+    override fun attackFrames(speed: Int, index: Int) =
+        if (speed < 30) 16 else 12 - attackAbilities[0].speeds.indexOfLast { speed >= it }
 }

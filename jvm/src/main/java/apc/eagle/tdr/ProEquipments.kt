@@ -10,7 +10,7 @@ import kotlinx.serialization.json.Json
 
 @Serializable
 @Suppress("unused")
-class DefaultEquipments : BaseRowModel() {
+class ProEquipments : BaseRowModel() {
 
     @ExcelProperty(index = 0)
     var heroId = 0
@@ -18,49 +18,49 @@ class DefaultEquipments : BaseRowModel() {
     @ExcelProperty(index = 1)
     var index = 1
 
-    @ExcelProperty(index = 4)
-    var id1 = 0
-
-    @ExcelProperty(index = 5)
-    var id2 = 0
+    @ExcelProperty(index = 2)
+    var name = ""
 
     @ExcelProperty(index = 6)
-    var id3 = 0
+    var id1 = 0
 
     @ExcelProperty(index = 7)
-    var id4 = 0
+    var id2 = 0
 
     @ExcelProperty(index = 8)
-    var id5 = 0
+    var id3 = 0
 
     @ExcelProperty(index = 9)
-    var id6 = 0
+    var id4 = 0
+
+    @ExcelProperty(index = 10)
+    var id5 = 0
 
     @ExcelProperty(index = 11)
-    var heroName = ""
-
-    @ExcelProperty(index = 13)
-    var equip1 = ""
-
-    @ExcelProperty(index = 14)
-    var equip2 = ""
+    var id6 = 0
 
     @ExcelProperty(index = 15)
-    var equip3 = ""
+    var equip1 = ""
 
     @ExcelProperty(index = 16)
-    var equip4 = ""
+    var equip2 = ""
 
     @ExcelProperty(index = 17)
-    var equip5 = ""
+    var equip3 = ""
 
     @ExcelProperty(index = 18)
+    var equip4 = ""
+
+    @ExcelProperty(index = 19)
+    var equip5 = ""
+
+    @ExcelProperty(index = 20)
     var equip6 = ""
 
-    override fun toString() = Json.stringify(DefaultEquipments.serializer, this)
+    override fun toString() = Json.stringify(ProEquipments.serializer, this)
 
     fun toType() = EquipConfig().also {
-        it.name = "系统推荐 - $index"
+        it.name = name
         it.equips[0] = id1
         it.equips[1] = id2
         it.equips[2] = id3
@@ -69,13 +69,13 @@ class DefaultEquipments : BaseRowModel() {
         it.equips[5] = id6
     }
 
-    companion object : Table<DefaultEquipments>() {
+    companion object : Table<ProEquipments>() {
         override val file = "96.推荐装备列表_elu"
-        private val serializer = DefaultEquipments.serializer()
-        override fun invoke(row: DefaultEquipments, context: AnalysisContext) {
+        override val table = 2
+        private val serializer = ProEquipments.serializer()
+        override fun invoke(row: ProEquipments, context: AnalysisContext) {
             HeroType.idMap[row.heroId]?.run {
-                equipConfigs[row.index - 1] = row.toType()
-                if (row.index == 1) applyEquipConfig()
+                equipConfigs[row.index + 2] = row.toType()
                 println(row)
             }
         }

@@ -4,9 +4,7 @@ import java.util.*
 
 class RuneConfig {
 
-    var id = 0
     var name = ""
-    var hero = 0
     val ids = Array(3) { linkedMapOf<Int, Int>() }
 
     fun toRunes(color: Int) = mutableListOf<Pair<Rune, Int>>().apply {
@@ -29,7 +27,7 @@ class RuneConfig {
     fun copyTo(target: RuneConfig) {
         target.ids.forEachIndexed { index, it ->
             it.clear()
-            it.putAll(ids[index])
+            it += ids[index]
         }
     }
 
