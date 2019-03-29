@@ -1,4 +1,4 @@
-package apc.eagle.fx
+package apc.eagle.fx.hero
 
 import apc.common.IntSlider
 import apc.common.plus
@@ -6,6 +6,8 @@ import apc.common.startStage
 import apc.eagle.common.Hero
 import apc.eagle.common.HeroType
 import apc.eagle.common.toEquip
+import apc.eagle.fx.equip.EquipButton
+import apc.eagle.fx.equip.EquipPane
 import apc.eagle.fx.rune.RuneButton
 import apc.eagle.fx.rune.RunePane
 import javafx.geometry.Insets
@@ -13,13 +15,9 @@ import javafx.geometry.Pos
 import javafx.scene.Node
 import javafx.scene.chart.NumberAxis
 import javafx.scene.chart.StackedAreaChart
-import javafx.scene.chart.XYChart
-import javafx.scene.control.Label
-import javafx.scene.control.Labeled
 import javafx.scene.input.MouseEvent
 import javafx.scene.layout.HBox
 import javafx.scene.layout.VBox
-import javafx.scene.paint.Color
 import javafx.scene.text.Text
 
 class HeroPane(private val type: HeroType) : VBox(4.0) {
@@ -28,40 +26,12 @@ class HeroPane(private val type: HeroType) : VBox(4.0) {
     private val runeBoxes = Array(3) { VBox(2.0).apply { prefHeight = 105.0 } }
     private val equipBox = HBox(2.0)
     private val xAxis = NumberAxis(-10.0, 210.0, 10.0)
-    private val yAxis = NumberAxis(5.0, 19.0, 1.0).apply { isMinorTickVisible = false }
-    private val speedData = XYChart.Data<Number, Number>().apply { node = Label().apply { textFill = Color.GREEN } }
+    private val attackCurves = mutableListOf<AttackCurve>()
 
     init {
-        hero.level = 15
-        updateChart()
-
-        val series = XYChart.Series<Number, Number>()
-        series.name = "普通攻击"
-        val upper = type.attackFrames(0)
-        var lower = upper
-        series.data.add(XYChart.Data(0, lower))
-        type.attackAbilities[0].speeds.forEach {
-            series.data.add(XYChart.Data((it - 1) / 10f, lower))
-            lower = type.attackFrames(it)
-
-            val x = it / 10f
-            val data: XYChart.Data<Number, Number> = XYChart.Data(x, lower)
-            data.node = Text(x.toString())
-            series.data.add(data)
-        }
-        series.data.add(XYChart.Data(200, lower))
-        series.data.add(speedData)
-
-        yAxis.lowerBound = lower - 1.0
-        yAxis.upperBound = upper + 1.0
-        val chart = StackedAreaChart<Number, Number>(xAxis, yAxis)
-        chart.data.add(series)
-        chart.title = "${type.name} 攻速档位"
-        chart.prefWidth = 600.0
-
         padding = Insets(4.0)
         alignment = Pos.TOP_CENTER
-        this + initRunes() + initEquips() + Text("英雄等级") + initLevel() + chart
+        this + initRunes() + initEquips() + Text("英雄等级") + initLevel() + initChart()
     }
 
     private fun initRunes() = HBox(4.0, runeBoxes[1], runeBoxes[2], runeBoxes[0]).apply {
@@ -106,14 +76,28 @@ class HeroPane(private val type: HeroType) : VBox(4.0) {
         updateChart()
     }
 
+    private fun initChart(): Node {
+        type.attackAbilities.forEachIndexed { index, _ -> attackCurves += AttackCurve(type, index) }
+        hero.level = 15
+        updateChart()
+
+        val lower = attackCurves.minBy { it.minFrames }!!.minFrames - 1.0
+        val upper = attackCurves.maxBy { it.maxFrames }!!.maxFrames + 1.0
+        val yAxis = NumberAxis("每次普通攻击间隔的帧数", lower, upper, 1.0)
+        yAxis.isMinorTickVisible = false
+
+        val chart = StackedAreaChart<Number, Number>(xAxis, yAxis)
+        chart.title = "${type.name} 攻速档位"
+        chart.prefWidth = 600.0
+        chart.data.addAll(attackCurves.map { it.series })
+        return chart
+    }
+
     private fun updateChart() {
         hero.updateAttributes()
-        val x = hero.expectedSpeed / 10f
-        val y = type.attackFrames(hero.expectedSpeed)
-        xAxis.label = "攻速加成 +$x%"
-        yAxis.label = "每次普通攻击间隔 $y 帧"
-        speedData.xValue = x
-        speedData.yValue = y
-        (speedData.node as Labeled).text = x.toString()
+        val speed = hero.expectedSpeed
+        val shadowEdge = 1136 in hero.type.equips
+        xAxis.label = "攻速加成 +${speed / 10f}%"
+        attackCurves.forEach { it.update(speed, shadowEdge) }
     }
 }

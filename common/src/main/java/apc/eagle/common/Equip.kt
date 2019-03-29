@@ -10,6 +10,7 @@ class Equip {
     var category = 0
     var price = 0
     var top = 0
+    var level = 0
     var hp = 0
     var regen = 0
     var attack = 0

@@ -7,6 +7,7 @@ import apc.eagle.common.Equip
 import apc.eagle.common.Hero
 import apc.eagle.common.HeroType
 import apc.eagle.common.Rune
+import apc.eagle.fx.hero.HeroPane
 import apc.eagle.fx.rune.RuneCell
 import javafx.beans.property.SimpleStringProperty
 import javafx.beans.value.ObservableValue

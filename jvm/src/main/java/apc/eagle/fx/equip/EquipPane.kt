@@ -1,4 +1,4 @@
-package apc.eagle.fx
+package apc.eagle.fx.equip
 
 import apc.common.center
 import apc.common.copyable
@@ -7,7 +7,7 @@ import apc.eagle.common.Equip
 import apc.eagle.common.EquipConfig
 import apc.eagle.common.HeroType
 import apc.eagle.common.toEquip
-import javafx.beans.property.SimpleStringProperty
+import javafx.beans.property.SimpleIntegerProperty
 import javafx.geometry.Insets
 import javafx.geometry.Pos
 import javafx.scene.control.*
@@ -24,7 +24,7 @@ class EquipPane(private val hero: HeroType) : BorderPane() {
     private val tilePane = TilePane(2.0, 2.0).apply {
         padding = Insets(2.0)
         style = "-fx-border-color: black"
-        prefColumns = 4
+        prefColumns = 6
     }
 
     private val buttons = Array(6) { index ->
@@ -75,9 +75,7 @@ class EquipPane(private val hero: HeroType) : BorderPane() {
 
     private fun updateCategory() {
         tilePane.children.setAll(Equip.idMap.values.filter { it.category == category }.sortedBy { -it.price }.map {
-            val button = Button(it.name)
-            button.setPrefSize(80.0, 30.0)
-            button.copyable()
+            EquipButton(it).copyable()
         })
     }
 
@@ -87,16 +85,16 @@ class EquipPane(private val hero: HeroType) : BorderPane() {
     }
 
     private fun initConfigs() = TableView<EquipConfig>().apply {
-        setPrefSize(520.0, 200.0)
+        setPrefSize(450.0, 200.0)
         columnResizePolicy = TableView.UNCONSTRAINED_RESIZE_POLICY
         val nameColumn = TableColumn<EquipConfig, String>("双击使用")
         nameColumn.cellValueFactory = PropertyValueFactory<EquipConfig, String>(EquipConfig::name.name)
         nameColumn.center()
 
         val equips = Array(6) { index ->
-            val column = TableColumn<EquipConfig, String>((1 + index).toString())
-            column.setCellValueFactory { SimpleStringProperty(it.value.equips[index].toEquip()?.name) }
-            column.center()
+            val column = TableColumn<EquipConfig, Number>((1 + index).toString())
+            column.setCellValueFactory { SimpleIntegerProperty(it.value.equips[index]) }
+            column.setCellFactory { EquipCell() }
             column
         }
         columns.setAll(nameColumn, *equips)

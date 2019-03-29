@@ -43,7 +43,7 @@ class Ability {
         return frames
     }
 
-    fun attackFrames(speed: Int) = SpeedModel[speedModel]?.frames(speed) ?: rawFrames(speed) + swing
+    internal fun attackFrames(speed: Int) = SpeedModel[speedModel]?.frames(speed) ?: rawFrames(speed) + swing
 
     override fun toString() = toJson()
 

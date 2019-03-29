@@ -78,6 +78,7 @@ class Equipment : BaseRowModel() {
         it.category = category
         it.price = price
         it.top = top
+        it.level = level
         it.attack = attack
         it.attackSpeed = attackSpeed / 10
         it.critical = critical
@@ -110,10 +111,10 @@ class Equipment : BaseRowModel() {
 
         @Suppress("unused")
         private fun copyResources() {
-            val icon = Paths.get("D:\\Kings\\trunk\\UI\\5_Dynamic\\Icon")
-            val res = Paths.get("resources")
+            val icon = Paths.get("D:\\Kings\\trunk0\\UI\\4_System\\BattleEquip")
+            val res = Paths.get("resources/equip")
             res.toFile().mkdirs()
-            Equip.idMap.keys.forEach { icon + "$it.png" copyTo res + "equip" }
+            Equip.idMap.keys.forEach { icon + "$it.png" copyTo res }
         }
     }
 }
