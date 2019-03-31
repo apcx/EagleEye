@@ -1,6 +1,5 @@
 package apc.eagle.common
 
-import apc.eagle.common.GameData.MS_FRAME
 import com.google.gson.Gson
 
 open class HeroType : UnitType() {
@@ -21,6 +20,7 @@ open class HeroType : UnitType() {
     val attackAbilities = mutableListOf<Ability>()
     val abilities = IntArray(4)
     var passiveSpeed = 0
+    open val passiveSpeedName get() = attackAbilities[0].name
 
     fun applyEquipConfig(index: Int = 0) {
         equipConfigs[index]?.equips?.copyInto(equips)
@@ -30,7 +30,7 @@ open class HeroType : UnitType() {
         RuneConfig[defaultRuneConfig]?.copyTo(runeConfig)
     }
 
-    fun initSpeeds() {
+    open fun initSpeeds() {
         attackAbilities.forEach(Ability::initSpeeds)
     }
 
@@ -41,13 +41,6 @@ open class HeroType : UnitType() {
     companion object {
         val idMap = mutableMapOf<Int, HeroType>()
         val nameMap = mutableMapOf<String, HeroType>()
-
-        fun speedFrames(cd: Int, speed: Int): Int {
-            val ms = cd * 1000 / (1000 + speed)
-            var frames = ms / MS_FRAME
-            if (ms % MS_FRAME != 0) ++frames
-            return frames
-        }
     }
 }
 

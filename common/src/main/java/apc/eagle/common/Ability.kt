@@ -2,10 +2,10 @@ package apc.eagle.common
 
 import java.util.*
 
-class Ability {
+class Ability() {
 
     var id = 0
-    var name = "攻击"
+    var name = ""
     var slot = 0
     var cd = 1000
 
@@ -17,6 +17,12 @@ class Ability {
 
     @Transient
     lateinit var speeds: IntArray
+
+    constructor(name: String, cd: Int, swing: Int) : this() {
+        this.name = name
+        this.cd = cd
+        this.swing = swing
+    }
 
     fun initSpeeds() {
         if (!::speeds.isInitialized) speeds = buildSpeeds()

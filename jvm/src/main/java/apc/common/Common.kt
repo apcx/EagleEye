@@ -23,6 +23,8 @@ infix fun Path.copyTo(directory: Path) {
     Files.copy(this, directory + fileName, StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.COPY_ATTRIBUTES)
 }
 
+inline fun <reified T : Node> T.border() = apply { style = "-fx-border-color: black" }
+
 val Node.stage get() = scene.window!!
 
 fun Window.startStage(title: String, root: Parent) {

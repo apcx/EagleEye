@@ -1,7 +1,6 @@
 package apc.eagle.common
 
 import kotlin.math.max
-import kotlin.math.min
 
 class Hero(val type: HeroType) {
 
@@ -13,7 +12,7 @@ class Hero(val type: HeroType) {
     fun updateAttributes() {
         baseAttackSpeed = type.bonusAttackSpeed * (level - 1)
         auraSpeed = 0
-        type.equips.map(Equip.idMap::get).filterNotNull().forEach {
+        type.equips.map(Int::toEquip).filterNotNull().forEach {
             baseAttackSpeed += it.attackSpeed
             when (it.name) {
                 "极影" -> auraSpeed = 300
@@ -25,5 +24,5 @@ class Hero(val type: HeroType) {
         baseAttackSpeed += rune.attackSpeed
     }
 
-    val expectedSpeed get() = min(baseAttackSpeed + auraSpeed + type.passiveSpeed, 2000)
+    val expectedSpeed get() = baseAttackSpeed + auraSpeed + type.passiveSpeed
 }

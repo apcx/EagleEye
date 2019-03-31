@@ -1,5 +1,6 @@
 package apc.eagle.fx.equip
 
+import apc.common.border
 import apc.common.center
 import apc.common.copyable
 import apc.common.onCopy
@@ -21,9 +22,8 @@ class EquipPane(private val hero: HeroType) : BorderPane() {
 
     private val group = ToggleGroup()
     private var category = 1
-    private val tilePane = TilePane(2.0, 2.0).apply {
+    private val tilePane = TilePane(2.0, 2.0).border().apply {
         padding = Insets(2.0)
-        style = "-fx-border-color: black"
         prefColumns = 6
     }
 

@@ -6,6 +6,7 @@ import apc.common.plus
 import apc.eagle.common.HeroType
 import apc.eagle.common.Rune
 import apc.eagle.common.RuneConfig
+import apc.eagle.common.toRune
 import javafx.geometry.Insets
 import javafx.geometry.Pos
 import javafx.scene.control.Button
@@ -66,7 +67,7 @@ internal class ColorRunePane(private val hero: HeroType, private val color: Int)
         alignment = Pos.BOTTOM_CENTER
         buttons.forEachIndexed { index, button ->
             button.onCopy { string, drop ->
-                val rune = Rune.nameMap[string]
+                val rune = string.toRune()
                 if (rune == null || rune.color != color || rune == buttons[0].rune || rune == buttons[1].rune) {
                     false
                 } else {
