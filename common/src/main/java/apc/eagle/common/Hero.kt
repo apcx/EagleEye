@@ -4,7 +4,7 @@ import kotlin.math.max
 
 class Hero(val type: HeroType) {
 
-    var level = 1
+    var level = 15
     var baseAttackSpeed = 0
     var auraSpeed = 0
     var attackIndex = 0
@@ -24,5 +24,5 @@ class Hero(val type: HeroType) {
         baseAttackSpeed += rune.attackSpeed
     }
 
-    val expectedSpeed get() = baseAttackSpeed + auraSpeed + type.passiveSpeed
+    val expectedSpeed get() = baseAttackSpeed + auraSpeed + type.passiveSpeed(level)
 }

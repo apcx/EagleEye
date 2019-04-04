@@ -4,8 +4,10 @@ import apc.eagle.common.HeroType
 import javafx.application.Platform
 import javafx.scene.chart.XYChart
 import javafx.scene.control.Label
+import javafx.scene.control.Labeled
 import javafx.scene.image.ImageView
 import javafx.scene.text.Text
+import kotlin.math.max
 import kotlin.math.min
 
 internal class AttackCurve(private val type: HeroType, private val index: Int) {
@@ -14,20 +16,21 @@ internal class AttackCurve(private val type: HeroType, private val index: Int) {
     internal val maxFrames: Int
     internal val minFrames: Int
     private val attackData = XYChart.Data<Number, Number>().apply { node = Label("X") }
-    private val slowerData = XYChart.Data<Number, Number>()
-    private val quickerData = XYChart.Data<Number, Number>()
+    private val ironData = XYChart.Data<Number, Number>()
+    private val stormData = XYChart.Data<Number, Number>()
+    private val tempData = XYChart.Data<Number, Number>().apply { node = Label() }
     private val name: String
 
     init {
-        val slowerImageView = ImageView("equip/1333.png")
-        slowerImageView.fitWidth = 30.0
-        slowerImageView.fitHeight = 30.0
-        slowerData.node = slowerImageView
+        val ironView = ImageView("equip/1333.png")
+        ironView.fitWidth = 30.0
+        ironView.fitHeight = 30.0
+        ironData.node = ironView
 
-        val quickerImageView = ImageView("equip/1136.png")
-        quickerImageView.fitWidth = 30.0
-        quickerImageView.fitHeight = 30.0
-        quickerData.node = quickerImageView
+        val stormView = ImageView("equip/1136.png")
+        stormView.fitWidth = 30.0
+        stormView.fitHeight = 30.0
+        stormData.node = stormView
 
         var y = type.attackFrames(0, index)
         maxFrames = y
@@ -46,24 +49,38 @@ internal class AttackCurve(private val type: HeroType, private val index: Int) {
         series.data.addAll(dataList)
     }
 
-    internal fun update(speed: Int, shadowEdge: Boolean) {
-        if (shadowEdge) {
-            if (slowerData in series.data) series.data.remove(slowerData)
-            quickerData.update(speed + 300)
-            if (quickerData !in series.data) Platform.runLater { series.data.add(series.data.size - 1, quickerData) }
+    internal fun update(speed: Int, storm: Boolean, level: Int) {
+        val speeds = type.attackAbilities[index].speeds
+        val ironSpeed = speed - 300
+        ironData.update(!storm, ironSpeed, max(0, 1 + speeds.indexOfLast { it <= ironSpeed }) * 2)
+
+        val index200 = speeds.size * 2 + 1
+        stormData.update(storm, speed + 300, index200)
+
+        val tempSpeed = type.tempSpeed(level)
+        if (tempSpeed > (if (storm) 300 else 0)) {
+            tempData.update(true, speed + tempSpeed, index200)
+            (tempData.node as Labeled).text = "${type.tempSpeedName}\n+${(tempSpeed / 10)}%"
         } else {
-            if (quickerData in series.data) series.data.remove(quickerData)
-            slowerData.update(speed - 300)
-            if (slowerData !in series.data) Platform.runLater { series.data.add(0, slowerData) }
+            tempData.update(false, 0, 0)
         }
+
         series.name = "$name${attackData.update(speed)}帧"
+    }
+
+    private fun XYChart.Data<Number, Number>.update(visible: Boolean, speed: Int, index: Int) {
+        if (visible) {
+            update(speed)
+            Platform.runLater { if (this !in series.data) series.data.add(index, this) }
+        } else if (this in series.data) {
+            series.data.remove(this)
+        }
     }
 
     private fun XYChart.Data<Number, Number>.update(rawSpeed: Int): Int {
         val speed = min(rawSpeed, 2000)
-        val x = speed / 10f
         val y = type.attackFrames(speed, index)
-        xValue = x
+        xValue = speed / 10f
         yValue = y
         return y
     }

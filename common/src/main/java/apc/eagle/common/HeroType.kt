@@ -19,8 +19,11 @@ open class HeroType : UnitType() {
     val runeConfig = RuneConfig()
     val attackAbilities = mutableListOf<Ability>()
     val abilities = IntArray(4)
-    var passiveSpeed = 0
+    open fun passiveSpeed(level: Int) = 0
     open val passiveSpeedName get() = attackAbilities[0].name
+    open fun tempSpeed(level: Int) = 0
+    open val tempSpeedName = ""
+    open val canCritical = true
 
     fun applyEquipConfig(index: Int = 0) {
         equipConfigs[index]?.equips?.copyInto(equips)

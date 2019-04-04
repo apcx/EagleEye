@@ -86,7 +86,6 @@ class HeroPane(private val type: HeroType) : VBox(4.0) {
 
     private fun initChart(): Node {
         type.attackAbilities.forEachIndexed { index, _ -> attackCurves += AttackCurve(type, index) }
-        hero.level = 15
         updateChart()
 
         val lower = attackCurves.minBy { it.minFrames }!!.minFrames - 1.0
@@ -104,15 +103,17 @@ class HeroPane(private val type: HeroType) : VBox(4.0) {
 
     private fun updateChart() {
         hero.updateAttributes()
-        if (type.passiveSpeed > 0) {
+        val level = hero.level
+        val passiveSpeed = type.passiveSpeed(level)
+        if (passiveSpeed > 0) {
             passiveLabel.isVisible = true
-            passiveLabel.text = "${type.passiveSpeedName}\n攻速+${type.passiveSpeed / 10}%"
+            passiveLabel.text = "${type.passiveSpeedName}\n攻速+${passiveSpeed / 10}%"
         } else {
             passiveLabel.isVisible = false
         }
         val speed = hero.expectedSpeed
-        val shadowEdge = 1136 in hero.type.equips
+        val storm = type.canCritical && 1136 in hero.type.equips
         xAxis.label = "攻速加成 +${speed / 10f}%"
-        attackCurves.forEach { it.update(speed, shadowEdge) }
+        attackCurves.forEach { it.update(speed, storm, level) }
     }
 }

@@ -40,7 +40,6 @@ class SolutionPane : VBox() {
         speedColumn.setCellValueFactory {
             val type = it.value
             val hero = Hero(type)
-            hero.level = 15
             hero.updateAttributes()
             val speed = min(hero.expectedSpeed, 2000)
             SimpleStringProperty("${"%.1f".format(speed / 10f)} - ${type.attackFrames(speed)}")
