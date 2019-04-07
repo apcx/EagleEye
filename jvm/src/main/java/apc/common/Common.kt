@@ -68,3 +68,7 @@ fun Node.onCopy(check: (string: String, drop: Boolean) -> Boolean) {
 fun TableColumn<*, *>.center() {
     style = "-fx-alignment: CENTER"
 }
+
+fun TableColumn<*, *>.right() {
+    style = "-fx-alignment: CENTER-RIGHT"
+}

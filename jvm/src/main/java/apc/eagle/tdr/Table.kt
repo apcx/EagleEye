@@ -18,10 +18,10 @@ abstract class Table<T : BaseRowModel> : AnalysisEventListener<T>() {
     internal open val table = 1
     private val type get(): T? = null
 
-    internal fun load(custom: Any? = null) {
+    internal fun load() {
         @Suppress("SpellCheckingInspection")
         Tdr.root.resolve("$file.xlsx").toFile().inputStream()
-            .use { ExcelReader(it, custom, this).read(Sheet(table, 1, ::type.jClass)) }
+            .use { ExcelReader(it, null, this).read(Sheet(table, 1, ::type.jClass)) }
     }
 
     override fun doAfterAllAnalysed(context: AnalysisContext) {}

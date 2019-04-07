@@ -1,7 +1,7 @@
 package apc.eagle.tdr
 
 import apc.eagle.common.Ability
-import apc.eagle.common.HeroType
+import apc.eagle.common.toHero
 import com.alibaba.excel.annotation.ExcelProperty
 import com.alibaba.excel.context.AnalysisContext
 import com.alibaba.excel.metadata.BaseRowModel
@@ -23,6 +23,9 @@ class AbilityInfo : BaseRowModel() {
     @ExcelProperty(index = 49)
     var cd = 0
 
+    @ExcelProperty(index = 87)
+    var type = ""
+
     override fun toString() = Json.stringify(serializer, this)
 
     fun toType() = Ability().also {
@@ -30,6 +33,11 @@ class AbilityInfo : BaseRowModel() {
         it.name = name
         it.slot = slot
         it.cd = cd
+        when (type) {
+            "物理伤害效果" -> it.type = Ability.TYPE_PHYSICAL
+            "魔法伤害效果" -> it.type = Ability.TYPE_MAGIC
+            "真实伤害效果" -> it.type = Ability.TYPE_REAL
+        }
     }
 
     companion object : Table<AbilityInfo>() {
@@ -37,14 +45,21 @@ class AbilityInfo : BaseRowModel() {
         private val serializer = AbilityInfo.serializer()
         override fun invoke(row: AbilityInfo, context: AnalysisContext) {
             val heroId = row.id / 100
-            HeroType.idMap[heroId]?.run {
+            heroId.toHero()?.run {
                 val type = row.toType()
                 Ability[row.id] = type
-                println(type)
-                if (row.id == heroId * 100)
+                println(row)
+                if (row.id == heroId * 100) {
+                    type.attackFactor = 100
+                    type.hasExpertise = true
+                    type.hasOrb = true
+                    type.canCritical = true
+                    if (type.type <= 0) type.type = Ability.TYPE_PHYSICAL
                     attackAbilities += type
-                else if (row.slot > 0)
+                } else if (row.slot > 0) {
+                    type.isSpell = true
                     abilities[row.slot - 1] = row.id
+                }
             }
         }
     }

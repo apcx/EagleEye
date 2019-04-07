@@ -20,7 +20,17 @@ class RuneConfig {
         val runes = mutableListOf<Pair<Rune, Int>>()
         repeat(3) { runes += toRunes(1 + it) }
         runes.forEach {
+            hp += it.first.hp * it.second
+            regen += it.first.regen * it.second
             attackSpeed += it.first.attackSpeed * it.second
+            attack += it.first.attack * it.second
+            defense += it.first.defense * it.second
+            penetrate += it.first.penetrate * it.second
+            critical += it.first.critical * it.second
+            criticalDamage += it.first.criticalDamage * it.second
+            magic += it.first.magic * it.second
+            magicDefense += it.first.magicDefense * it.second
+            magicPenetrate += it.first.magicPenetrate * it.second
         }
     }
 

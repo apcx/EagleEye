@@ -81,7 +81,7 @@ class Equipment : BaseRowModel() {
         it.level = level
         it.attack = attack
         it.attackSpeed = attackSpeed / 10
-        it.critical = critical
+        it.critical = critical / 10
         it.magic = magic
         it.cdr = cdr
         it.defense = defense

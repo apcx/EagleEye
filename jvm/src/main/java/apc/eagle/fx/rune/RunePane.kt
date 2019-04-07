@@ -23,10 +23,10 @@ class RunePane(hero: HeroType) : HBox() {
     private fun initConfigs(hero: HeroType) = TableView<RuneConfig>().apply {
         setPrefSize(320.0, 200.0)
         columnResizePolicy = TableView.UNCONSTRAINED_RESIZE_POLICY
-        val nameColumn = TableColumn<RuneConfig, String>("双击使用")
-        nameColumn.cellValueFactory = PropertyValueFactory<RuneConfig, String>(RuneConfig::name.name)
-        nameColumn.center()
-        columns.setAll(nameColumn, column(Rune.BLUE), column(Rune.GREEN), column(Rune.RED))
+        val name = TableColumn<RuneConfig, String>("双击使用")
+        name.cellValueFactory = PropertyValueFactory<RuneConfig, String>(RuneConfig::name.name)
+        name.center()
+        columns.setAll(name, column(Rune.BLUE), column(Rune.GREEN), column(Rune.RED))
 
         val defaultConfig = RuneConfig[hero.defaultRuneConfig]
         items.add(defaultConfig)

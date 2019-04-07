@@ -4,5 +4,8 @@ import apc.eagle.common.HeroType
 
 @Suppress("unused")
 class Hero196 : HeroType() { // 百里守约
-    override val canCritical = false
+    override fun initAbilities() {
+        super.initAbilities()
+        attackAbilities[0].canCritical = false
+    }
 }

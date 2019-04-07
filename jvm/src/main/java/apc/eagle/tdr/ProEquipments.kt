@@ -1,7 +1,7 @@
 package apc.eagle.tdr
 
 import apc.eagle.common.EquipConfig
-import apc.eagle.common.HeroType
+import apc.eagle.common.toHero
 import com.alibaba.excel.annotation.ExcelProperty
 import com.alibaba.excel.context.AnalysisContext
 import com.alibaba.excel.metadata.BaseRowModel
@@ -74,7 +74,7 @@ class ProEquipments : BaseRowModel() {
         override val table = 2
         private val serializer = ProEquipments.serializer()
         override fun invoke(row: ProEquipments, context: AnalysisContext) {
-            HeroType.idMap[row.heroId]?.run {
+            row.heroId.toHero()?.run {
                 equipConfigs[row.index + 2] = row.toType()
                 println(row)
             }

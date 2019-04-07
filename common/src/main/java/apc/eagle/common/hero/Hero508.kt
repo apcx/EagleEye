@@ -5,8 +5,8 @@ import apc.eagle.common.HeroType
 
 @Suppress("unused")
 class Hero508 : HeroType() { // 伽罗
-    override fun initSpeeds() {
+    override fun initAbilities() {
         if (attackAbilities.size == 1) attackAbilities += Ability("长弓", 1250, 1)
-        super.initSpeeds()
+        super.initAbilities()
     }
 }

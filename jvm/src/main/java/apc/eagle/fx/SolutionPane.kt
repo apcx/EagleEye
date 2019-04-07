@@ -25,11 +25,11 @@ class SolutionPane : VBox() {
     private val group = ToggleGroup()
 
     init {
-        val nameColumn = TableColumn<HeroType, String>("英雄")
-        nameColumn.cellValueFactory = PropertyValueFactory<HeroType, String>(HeroType::name.name)
-        nameColumn.center()
+        val name = TableColumn<HeroType, String>("英雄")
+        name.cellValueFactory = PropertyValueFactory<HeroType, String>(HeroType::name.name)
+        name.center()
 
-        val equipColumns = Array(6) { index ->
+        val equips = Array(6) { index ->
             val column = TableColumn<HeroType, String>((1 + index).toString())
             column.setCellValueFactory { SimpleStringProperty(it.value.equips[index].toEquip()?.name) }
             column.center()
@@ -40,24 +40,21 @@ class SolutionPane : VBox() {
         speedColumn.setCellValueFactory {
             val type = it.value
             val hero = Hero(type)
-            hero.updateAttributes()
             val speed = min(hero.expectedSpeed, 2000)
             SimpleStringProperty("${"%.1f".format(speed / 10f)} - ${type.attackFrames(speed)}")
         }
         speedColumn.center()
 
-        val tableView = TableView<HeroType>()
-        tableView.columnResizePolicy = TableView.UNCONSTRAINED_RESIZE_POLICY
-        tableView.columns.setAll(
-            nameColumn, *equipColumns, column(Rune.BLUE), column(Rune.GREEN), column(Rune.RED), speedColumn
-        )
-        tableView.setRowFactory {
+        val table = TableView<HeroType>()
+        table.columnResizePolicy = TableView.UNCONSTRAINED_RESIZE_POLICY
+        table.columns.setAll(name, *equips, column(Rune.BLUE), column(Rune.GREEN), column(Rune.RED), speedColumn)
+        table.setRowFactory {
             val row = TableRow<HeroType>()
             row.onMouseClicked = EventHandler<MouseEvent> { event ->
                 if (event.clickCount == 2) {
                     val type = row.item
                     startStage("${type.name} 攻速档位", HeroPane(type))
-                    tableView.refresh()
+                    table.refresh()
                 }
             }
             row
@@ -73,16 +70,16 @@ class SolutionPane : VBox() {
                 categoryHeroes += allHeroes.filter { it.category == category }.sortedBy { it.order }
                 categoryHeroes += allHeroes.filter { it.secondaryCategory == category }.sortedBy { it.order }
             }
-            categoryHeroes.forEach(HeroType::initSpeeds)
-            tableView.items.setAll(categoryHeroes)
+            categoryHeroes.forEach(HeroType::initAbilities)
+            table.items.setAll(categoryHeroes)
         }
 
         val tabs = HBox(2.0)
         tabs.padding = Insets(2.0)
         tabs.alignment = Pos.TOP_CENTER
-        tabs /* + addTab("全部") */ + addTab("坦克") + addTab("战士") +
-                addTab("刺客") + addTab("法师") + addTab("射手", true)
-        this + tabs + tableView
+        tabs /* + addTab("全部") */ + addTab("坦克") + addTab("战士") + addTab("刺客") +
+                addTab("法师") + addTab("射手", true) + addTab("辅助")
+        this + tabs + table
     }
 
     private fun addTab(category: String, selected: Boolean = false) = RadioButton(category).apply {

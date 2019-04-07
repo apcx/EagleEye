@@ -6,7 +6,9 @@ import apc.common.plus
 import apc.common.startStage
 import apc.eagle.common.Hero
 import apc.eagle.common.HeroType
+import apc.eagle.common.Skin
 import apc.eagle.common.toEquip
+import apc.eagle.fx.battle.BattlePane
 import apc.eagle.fx.equip.EquipButton
 import apc.eagle.fx.equip.EquipPane
 import apc.eagle.fx.rune.RuneButton
@@ -16,7 +18,9 @@ import javafx.geometry.Pos
 import javafx.scene.Node
 import javafx.scene.chart.AreaChart
 import javafx.scene.chart.NumberAxis
+import javafx.scene.control.Button
 import javafx.scene.control.Label
+import javafx.scene.image.ImageView
 import javafx.scene.input.MouseEvent
 import javafx.scene.layout.HBox
 import javafx.scene.layout.VBox
@@ -25,28 +29,50 @@ import javafx.scene.text.Text
 class HeroPane(private val type: HeroType) : VBox(4.0) {
 
     private val hero = Hero(type)
-    private val runeBoxes = Array(3) { VBox(2.0).apply { prefHeight = 105.0 } }
     private val equipBox = HBox(2.0)
     private val passiveLabel = Label().border().apply { padding = Insets(2.0) }
     private val xAxis = NumberAxis(-10.0, 210.0, 10.0)
     private val attackCurves = mutableListOf<AttackCurve>()
 
-    init {
-        padding = Insets(4.0)
-        alignment = Pos.TOP_CENTER
-        this + initRunes() + initEquips() + initLevel() + initChart()
-    }
-
-    private fun initRunes() = HBox(4.0, runeBoxes[1], runeBoxes[2], runeBoxes[0]).apply {
-        alignment = Pos.TOP_CENTER
-        resetRuneButtons()
-        addEventFilter(MouseEvent.MOUSE_CLICKED) {
+    private val runeBoxes = Array(3) {
+        val box = VBox(2.0)
+        box.prefHeight = 105.0
+        box.addEventFilter(MouseEvent.MOUSE_CLICKED) {
             val pane = RunePane(type)
             startStage("${type.name} 铭文方案", pane)
             pane.save()
             resetRuneButtons()
             updateChart()
         }
+        box
+    }
+
+    init {
+        padding = Insets(4.0)
+        alignment = Pos.TOP_CENTER
+        this + initRunes() + initEquips() + initLevel() + initChart() + initBattle()
+    }
+
+    private fun initRunes() = HBox(16.0).apply {
+        alignment = Pos.CENTER
+        val head = ImageView("rune/1501.png")
+//        val head = ImageView("head/${type.preferredIcon}.png")
+        head.fitWidth = 50.0
+        head.fitHeight = 50.0
+        val box = VBox(4.0, Label(type.name).apply { graphic = head })
+        box.alignment = Pos.CENTER
+        if (type.skins.size >= 2) {
+            val skin = when (type.skins.last().type) {
+                Skin.TYPE_ATTACK -> "物理攻击+10"
+                Skin.TYPE_MAGIC -> "法术攻击+10"
+                Skin.TYPE_HP -> "最大生命+120"
+                else -> ""
+            }
+            box + Label(skin).border().apply { padding = Insets(2.0) }
+        }
+
+        resetRuneButtons()
+        this + box + runeBoxes[1] + runeBoxes[2] + runeBoxes[0]
     }
 
     private fun resetRuneButtons() {
@@ -94,7 +120,6 @@ class HeroPane(private val type: HeroType) : VBox(4.0) {
         yAxis.isMinorTickVisible = false
 
         val chart = AreaChart<Number, Number>(xAxis, yAxis)
-        chart.title = "${type.name} 攻速档位"
         chart.prefWidth = 600.0
         if (type.attackAbilities.size > 1) chart.prefHeight = 600.0
         chart.data.addAll(attackCurves.map { it.series })
@@ -112,8 +137,13 @@ class HeroPane(private val type: HeroType) : VBox(4.0) {
             passiveLabel.isVisible = false
         }
         val speed = hero.expectedSpeed
-        val storm = type.canCritical && 1136 in hero.type.equips
+        val storm = type.attackAbilities[0].canCritical && 1136 in hero.type.equips
         xAxis.label = "攻速加成 +${speed / 10f}%"
         attackCurves.forEach { it.update(speed, storm, level) }
+    }
+
+    private fun initBattle() = Button("攻击庄周").apply {
+        padding = Insets(16.0)
+        setOnAction { startStage("", BattlePane(type)) }
     }
 }

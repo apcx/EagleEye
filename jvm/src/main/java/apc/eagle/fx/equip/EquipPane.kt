@@ -87,9 +87,9 @@ class EquipPane(private val hero: HeroType) : BorderPane() {
     private fun initConfigs() = TableView<EquipConfig>().apply {
         setPrefSize(450.0, 200.0)
         columnResizePolicy = TableView.UNCONSTRAINED_RESIZE_POLICY
-        val nameColumn = TableColumn<EquipConfig, String>("双击使用")
-        nameColumn.cellValueFactory = PropertyValueFactory<EquipConfig, String>(EquipConfig::name.name)
-        nameColumn.center()
+        val name = TableColumn<EquipConfig, String>("双击使用")
+        name.cellValueFactory = PropertyValueFactory<EquipConfig, String>(EquipConfig::name.name)
+        name.center()
 
         val equips = Array(6) { index ->
             val column = TableColumn<EquipConfig, Number>((1 + index).toString())
@@ -97,7 +97,7 @@ class EquipPane(private val hero: HeroType) : BorderPane() {
             column.setCellFactory { EquipCell() }
             column
         }
-        columns.setAll(nameColumn, *equips)
+        columns.setAll(name, *equips)
         items.addAll(hero.equipConfigs.filterNotNull())
         setRowFactory {
             val row = TableRow<EquipConfig>()

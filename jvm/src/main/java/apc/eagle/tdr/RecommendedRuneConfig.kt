@@ -1,7 +1,7 @@
 package apc.eagle.tdr
 
-import apc.eagle.common.HeroType
 import apc.eagle.common.RuneConfig
+import apc.eagle.common.toHero
 import com.alibaba.excel.annotation.ExcelProperty
 import com.alibaba.excel.context.AnalysisContext
 import com.alibaba.excel.metadata.BaseRowModel
@@ -128,7 +128,7 @@ class RecommendedRuneConfig : BaseRowModel() {
         override val table = 9
         private val serializer = RecommendedRuneConfig.serializer()
         override fun invoke(row: RecommendedRuneConfig, context: AnalysisContext) {
-            HeroType.idMap[row.hero]?.run {
+            row.hero.toHero()?.run {
                 recommendedRuneConfigs += row.toType()
                 println(row)
             }

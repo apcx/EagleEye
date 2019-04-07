@@ -28,7 +28,7 @@ class SpeedModel(val swing: Int = 2) {
 
         fun initHeroes() {
             forEach { id, model ->
-                model.heroes.mapNotNull(HeroType.nameMap::get).forEach {
+                model.heroes.mapNotNull(String::toHero).forEach {
                     if (model::speeds.isInitialized) {
                         it.attackAbilities[0].speedModel = id
                         it.attackAbilities[0].speeds = model.speeds

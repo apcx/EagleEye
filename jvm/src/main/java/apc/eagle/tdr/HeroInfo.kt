@@ -1,6 +1,7 @@
 package apc.eagle.tdr
 
 import apc.eagle.common.HeroType
+import apc.eagle.common.UnitType
 import com.alibaba.excel.annotation.ExcelProperty
 import com.alibaba.excel.context.AnalysisContext
 import com.alibaba.excel.metadata.BaseRowModel
@@ -46,8 +47,11 @@ class HeroInfo : BaseRowModel() {
     @ExcelProperty("攻击力成长率", index = 80)
     var bonusAttack = 0
 
-    @ExcelProperty("攻击力成长率", index = 82)
+    @ExcelProperty("护甲成长率", index = 82)
     var bonusDefense = 0
+
+    @ExcelProperty("抗性成长率", index = 83)
+    var bonusMagicDefense = 0
 
     @ExcelProperty(index = 90)
     var category = ""
@@ -71,7 +75,7 @@ class HeroInfo : BaseRowModel() {
         }
         type.id = id
         type.name = name
-        if ("远程" in attackType) type.attackType = 2
+        if ("远程" in attackType) type.attackType = UnitType.RANGE
         type.baseHp = baseHp
         type.baseRegen = baseRegen
         type.baseAttack = baseAttack
@@ -86,6 +90,7 @@ class HeroInfo : BaseRowModel() {
         type.bonusAttack = bonusAttack
         type.bonusAttackSpeed = bonusAttackSpeed / 100000
         type.bonusDefense = bonusDefense
+        type.bonusMagicDefense = bonusMagicDefense
         type.defaultRuneConfig = runeConfig
         type.resetRunes()
         return type
@@ -95,7 +100,6 @@ class HeroInfo : BaseRowModel() {
         override val file = "11.英雄信息表_Xavier"
         private val serializer = HeroInfo.serializer()
         override fun invoke(row: HeroInfo, context: AnalysisContext) {
-            @Suppress("UNCHECKED_CAST")
             if (row.id in HeroEnable.ids && row.id !in HeroType.idMap) {
                 val type = row.toType()
                 HeroType.idMap[row.id] = type
