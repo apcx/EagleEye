@@ -17,15 +17,13 @@ import javafx.scene.layout.BorderPane
 import javafx.scene.layout.HBox
 import javafx.scene.layout.TilePane
 import javafx.scene.layout.VBox
+import javafx.scene.text.Text
 
 class EquipPane(private val hero: HeroType) : BorderPane() {
 
     private val group = ToggleGroup()
     private var category = 1
-    private val tilePane = TilePane(2.0, 2.0).border().apply {
-        padding = Insets(2.0)
-        prefColumns = 6
-    }
+    private val tilePane = TilePane(2.0, 2.0).border().apply { prefColumns = 6 }
 
     private val buttons = Array(6) { index ->
         val button = EquipButton(hero.equips[index].toEquip())
@@ -79,9 +77,9 @@ class EquipPane(private val hero: HeroType) : BorderPane() {
         })
     }
 
-    private fun initCurrentEquips() = HBox(2.0, *buttons).apply {
+    private fun initCurrentEquips() = HBox(8.0, Text("双击可清空装备栏"), *buttons).apply {
         padding = Insets(2.0)
-        alignment = Pos.TOP_CENTER
+        alignment = Pos.CENTER
     }
 
     private fun initConfigs() = TableView<EquipConfig>().apply {

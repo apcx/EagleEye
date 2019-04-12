@@ -23,6 +23,9 @@ class AbilityInfo : BaseRowModel() {
     @ExcelProperty(index = 49)
     var cd = 0
 
+    @ExcelProperty(index = 52)
+    var bonusCd = 0
+
     @ExcelProperty(index = 87)
     var type = ""
 
@@ -33,6 +36,7 @@ class AbilityInfo : BaseRowModel() {
         it.name = name
         it.slot = slot
         it.cd = cd
+        it.bonusCd = bonusCd
         when (type) {
             "物理伤害效果" -> it.type = Ability.TYPE_PHYSICAL
             "魔法伤害效果" -> it.type = Ability.TYPE_MAGIC
@@ -47,18 +51,17 @@ class AbilityInfo : BaseRowModel() {
             val heroId = row.id / 100
             heroId.toHero()?.run {
                 val type = row.toType()
-                Ability[row.id] = type
                 println(row)
                 if (row.id == heroId * 100) {
                     type.attackFactor = 100
-                    type.hasExpertise = true
-                    type.hasOrb = true
+                    type.canExpertise = true
+                    type.canOrb = true
                     type.canCritical = true
                     if (type.type <= 0) type.type = Ability.TYPE_PHYSICAL
                     attackAbilities += type
                 } else if (row.slot > 0) {
                     type.isSpell = true
-                    abilities[row.slot - 1] = row.id
+                    abilities[row.slot - 1] = type
                 }
             }
         }

@@ -27,7 +27,7 @@ internal class DamageCell : TableCell<Event, Event>() {
                         Ability.TYPE_BUFF -> textFill = Color.MIDNIGHTBLUE
                         Ability.TYPE_DEBUFF -> textFill = Color.ORANGERED
                     }
-                    item.ability.tipOn
+                    if (item.ability.maxStacks > 1) "叠加${item.stacks}层" else item.ability.tipOn
                 }
                 Event.TYPE_OFF -> {
                     font = defaultFont

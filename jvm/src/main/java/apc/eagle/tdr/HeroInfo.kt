@@ -41,6 +41,12 @@ class HeroInfo : BaseRowModel() {
     @ExcelProperty("基础移动速度", index = 68)
     var baseMove = 0
 
+    @ExcelProperty("基础暴击率", index = 77)
+    var baseCritical = 0
+
+    @ExcelProperty("基础暴击效果", index = 78)
+    var baseCriticalDamage = 0
+
     @ExcelProperty("生命成长率", index = 79)
     var bonusHp = 0
 
@@ -81,6 +87,8 @@ class HeroInfo : BaseRowModel() {
         type.baseAttack = baseAttack
         type.baseDefense = baseDefense
         type.baseMove = baseMove
+        type.baseCritical = baseCritical / 10
+        type.baseCriticalDamage = baseCriticalDamage / 10
 
         type.category = if ("辅助" in category) "辅助" else category
         type.secondaryCategory = if ("辅助" in secondaryCategory) "辅助" else secondaryCategory

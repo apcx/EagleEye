@@ -20,8 +20,10 @@ import javafx.scene.chart.AreaChart
 import javafx.scene.chart.NumberAxis
 import javafx.scene.control.Button
 import javafx.scene.control.Label
+import javafx.scene.control.Labeled
 import javafx.scene.image.ImageView
 import javafx.scene.input.MouseEvent
+import javafx.scene.layout.GridPane
 import javafx.scene.layout.HBox
 import javafx.scene.layout.VBox
 import javafx.scene.text.Text
@@ -30,9 +32,12 @@ class HeroPane(private val type: HeroType) : VBox(4.0) {
 
     private val hero = Hero(type)
     private val equipBox = HBox(2.0)
-    private val passiveLabel = Label().border().apply { padding = Insets(2.0) }
+    private val passiveLabel = Label().border()
     private val xAxis = NumberAxis(-10.0, 210.0, 10.0)
     private val attackCurves = mutableListOf<AttackCurve>()
+    private val criticalLabels = Array(2) { Label() }
+    private val avgLabels = Array(2) { Label() }
+    private val extraLabel = Label()
 
     private val runeBoxes = Array(3) {
         val box = VBox(2.0)
@@ -42,7 +47,7 @@ class HeroPane(private val type: HeroType) : VBox(4.0) {
             startStage("${type.name} 铭文方案", pane)
             pane.save()
             resetRuneButtons()
-            updateChart()
+            update()
         }
         box
     }
@@ -50,15 +55,14 @@ class HeroPane(private val type: HeroType) : VBox(4.0) {
     init {
         padding = Insets(4.0)
         alignment = Pos.TOP_CENTER
-        this + initRunes() + initEquips() + initLevel() + initChart() + initBattle()
+        this + initRunes() + initEquips() + initLevel() + initGrid() + initChart() + initBattle()
     }
 
     private fun initRunes() = HBox(16.0).apply {
         alignment = Pos.CENTER
-        val head = ImageView("rune/1501.png")
-//        val head = ImageView("head/${type.preferredIcon}.png")
-        head.fitWidth = 50.0
-        head.fitHeight = 50.0
+        val head = ImageView("head/${type.preferredIcon}.png")
+        head.fitWidth = 64.0
+        head.fitHeight = 64.0
         val box = VBox(4.0, Label(type.name).apply { graphic = head })
         box.alignment = Pos.CENTER
         if (type.skins.size >= 2) {
@@ -68,7 +72,7 @@ class HeroPane(private val type: HeroType) : VBox(4.0) {
                 Skin.TYPE_HP -> "最大生命+120"
                 else -> ""
             }
-            box + Label(skin).border().apply { padding = Insets(2.0) }
+            box + Label(skin).border()
         }
 
         resetRuneButtons()
@@ -89,7 +93,7 @@ class HeroPane(private val type: HeroType) : VBox(4.0) {
             startStage("${type.name} 装备方案", pane)
             pane.save()
             resetEquipButtons()
-            updateChart()
+            update()
         }
     }
 
@@ -104,15 +108,47 @@ class HeroPane(private val type: HeroType) : VBox(4.0) {
         alignment = Pos.CENTER
         val slider = IntSlider(1, 15) {
             hero.level = it
-            updateChart()
+            update()
         }
         slider.prefWidth = 450.0
         this + Text("英雄等级") + slider + passiveLabel
     }
 
+    private fun initGrid() = GridPane().apply {
+        alignment = Pos.TOP_CENTER
+        var row = 0
+        add("无双", criticalLabels[0], row)
+        add("祸源", criticalLabels[1], row + 1)
+        val runeLabel = Label("再多一个【5级铭文】对普通攻击的增益")
+        runeLabel.padding = Insets(16.0)
+        add(runeLabel, 2, row, 1, 2)
+        row += 2
+
+        if (hero.avgAttack[0] > 0) {
+            add("攻击", avgLabels[0], row)
+            add(type.specialAttackName, avgLabels[1], row + 1)
+            val label = Label("这两行的数值为【攻击力】计入暴击后的平均数学期望值")
+            label.padding = Insets(16.0)
+            add(label, 2, row, 1, 2)
+            row += 2
+        }
+        add("额外攻击", extraLabel, row)
+    }
+
+    private fun GridPane.add(key: String, value: Labeled, row: Int) {
+        val label = Label(key)
+        label.prefWidth = 60.0
+        label.alignment = Pos.TOP_CENTER
+        add(label.border(), 0, row)
+
+        value.prefWidth = 70.0
+        value.alignment = Pos.TOP_CENTER
+        add(value.border(), 1, row)
+    }
+
     private fun initChart(): Node {
         type.attackAbilities.forEachIndexed { index, _ -> attackCurves += AttackCurve(type, index) }
-        updateChart()
+        update()
 
         val lower = attackCurves.minBy { it.minFrames }!!.minFrames - 1.0
         val upper = attackCurves.maxBy { it.maxFrames }!!.maxFrames + 1.0
@@ -126,23 +162,34 @@ class HeroPane(private val type: HeroType) : VBox(4.0) {
         return chart
     }
 
-    private fun updateChart() {
+    private fun update() {
         hero.updateAttributes()
         val level = hero.level
-        val passiveSpeed = type.passiveSpeed(level)
+        val passiveSpeed = type.passiveSpeed
         if (passiveSpeed > 0) {
             passiveLabel.isVisible = true
             passiveLabel.text = "${type.passiveSpeedName}\n攻速+${passiveSpeed / 10}%"
         } else {
             passiveLabel.isVisible = false
         }
+
+        criticalLabels[0].text = hero.criticalDamageRuneBonus.toPercent()
+        criticalLabels[1].text = hero.criticalRuneBonus.toPercent()
+        if (hero.avgAttack[0] > 0) {
+            avgLabels[0].text = "${hero.avgAttack[0]}"
+            avgLabels[1].text = "${hero.avgAttack[1]}"
+        }
+        extraLabel.text = "+${hero.extraAttack}"
+
         val speed = hero.expectedSpeed
         val storm = type.attackAbilities[0].canCritical && 1136 in hero.type.equips
         xAxis.label = "攻速加成 +${speed / 10f}%"
         attackCurves.forEach { it.update(speed, storm, level) }
     }
 
-    private fun initBattle() = Button("攻击庄周").apply {
+    private fun Int.toPercent() = "+%.4f%%".format(this / 10000f)
+
+    private fun initBattle() = Button("攻击吕布").apply {
         padding = Insets(16.0)
         setOnAction { startStage("", BattlePane(type)) }
     }

@@ -5,7 +5,6 @@ import apc.common.plus
 import apc.common.right
 import apc.eagle.common.*
 import apc.eagle.common.Event.Companion.TYPE_HIT
-import apc.eagle.common.Event.Companion.TYPE_OFF
 import javafx.beans.property.SimpleIntegerProperty
 import javafx.beans.property.SimpleObjectProperty
 import javafx.beans.property.SimpleStringProperty
@@ -22,9 +21,9 @@ class BattlePane(type: HeroType) : VBox() {
     private val table = TableView<Event>()
 
     init {
-        val target = Hero("庄周".toHero()!!)
+        val target = Hero("吕布".toHero()!!)
         val battle = Battle(Hero(type), target)
-        val button = Button("攻击庄周\nHP : ${target.mhp}")
+        val button = Button("攻击吕布\nHP : ${target.mhp}")
         button.padding = Insets(16.0)
         button.setOnAction { table.items.setAll(battle.fight()) }
 
@@ -49,10 +48,7 @@ class BattlePane(type: HeroType) : VBox() {
         ability.setCellValueFactory {
             val event = it.value
             var name = event.ability.name
-            when (event.type) {
-                TYPE_HIT -> if (event.ability == event.attacker.type.attackAbilities[0]) name = "攻击"
-                TYPE_OFF -> name = "$name(失去)"
-            }
+            if (event.type == TYPE_HIT && event.ability == event.attacker.type.attackAbilities[0]) name = "攻击"
             SimpleStringProperty(name)
         }
         ability.center()
@@ -60,7 +56,7 @@ class BattlePane(type: HeroType) : VBox() {
         val target = TableColumn<Event, Number>("目标")
         target.setCellValueFactory {
             val event = it.value
-            SimpleIntegerProperty(if (event.type == TYPE_HIT) event.target.type.id else 0)
+            SimpleIntegerProperty(if (event.type == TYPE_HIT) event.target.type.skins[0].icon else 0)
         }
         target.setCellFactory { HeroCell() }
 
@@ -68,8 +64,8 @@ class BattlePane(type: HeroType) : VBox() {
         damage.setCellValueFactory { SimpleObjectProperty(it.value) }
         damage.setCellFactory { DamageCell() }
 
-        val hp = TableColumn<Event, Int>("HP")
-        hp.cellValueFactory = PropertyValueFactory<Event, Int>(Event::hp.name)
+        val hp = TableColumn<Event, String>("HP")
+        hp.setCellValueFactory { SimpleStringProperty(if (it.value.hp >= 0) it.value.hp.toString() else "") }
         hp.right()
 
         setPrefSize(600.0, 600.0)

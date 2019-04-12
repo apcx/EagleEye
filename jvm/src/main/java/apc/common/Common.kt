@@ -1,5 +1,6 @@
 package apc.common
 
+import javafx.geometry.Insets
 import javafx.scene.Node
 import javafx.scene.Parent
 import javafx.scene.Scene
@@ -8,6 +9,7 @@ import javafx.scene.control.TableColumn
 import javafx.scene.input.ClipboardContent
 import javafx.scene.input.TransferMode
 import javafx.scene.layout.Pane
+import javafx.scene.layout.Region
 import javafx.stage.Modality
 import javafx.stage.Stage
 import javafx.stage.StageStyle
@@ -23,7 +25,10 @@ infix fun Path.copyTo(directory: Path) {
     Files.copy(this, directory + fileName, StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.COPY_ATTRIBUTES)
 }
 
-inline fun <reified T : Node> T.border() = apply { style = "-fx-border-color: black" }
+inline fun <reified T : Region> T.border() = apply {
+    style = "-fx-border-color: black"
+    padding = Insets(2.0)
+}
 
 val Node.stage get() = scene.window!!
 

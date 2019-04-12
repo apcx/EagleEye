@@ -31,6 +31,7 @@ class RuneConfig {
             magic += it.first.magic * it.second
             magicDefense += it.first.magicDefense * it.second
             magicPenetrate += it.first.magicPenetrate * it.second
+            cdr += it.first.cdr * it.second
         }
     }
 

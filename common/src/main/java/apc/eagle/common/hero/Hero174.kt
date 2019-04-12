@@ -1,13 +1,40 @@
 package apc.eagle.common.hero
 
-import apc.eagle.common.Ability
-import apc.eagle.common.HeroType
-import kotlin.math.min
+import apc.eagle.common.*
 
 @Suppress("unused")
 class Hero174 : HeroType() { // 虞姬
-    override fun passiveSpeed(level: Int) = 180 + (min(level, 11) + 1) / 2 * 20
-    override val passiveSpeedName get() = Ability[abilities[1]]!!.name
+
+    override val preferredIcon = 301742
     override fun tempSpeed(level: Int) = if (level >= 4) 200 + level / 4 * 100 else 0
-    override val tempSpeedName get() = Ability[abilities[2]]!!.name
+    override val tempSpeedName get() = abilities[2].name
+    override val learn = intArrayOf(
+        2, 1, 2, 3,
+        2, 1, 2, 3,
+        2, 1, 2, 3,
+        1, 1, 1
+    )
+
+    override fun updateSpecificAttributes(hero: Hero) {
+        ExtraArrow.extraDamage = 95 + hero.level * 5
+        val level = hero.abilityLevels[1]
+        if (level > 0) hero.baseAttackSpeed += 180 + level * 20
+    }
+
+    override fun doAttack(actor: Hero, target: Hero) {
+        super.doAttack(actor, target)
+        actor.heroRage += 25
+        if (actor.heroRage >= 100) {
+            actor.heroRage -= 100
+            actor.battle.events += Event(target.battle.time + GameData.MS_FRAME * 4, target, actor, ExtraArrow)
+        }
+    }
+}
+
+object ExtraArrow : Ability("小箭", TYPE_PHYSICAL) {
+    init {
+        attackFactor = 20
+        canExpertise = true
+        canOrb = true
+    }
 }

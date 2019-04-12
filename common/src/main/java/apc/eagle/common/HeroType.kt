@@ -10,6 +10,8 @@ open class HeroType : UnitType() {
     var category = ""
     var secondaryCategory = ""
     var order = 0
+    var baseCritical = 0
+    var baseCriticalDamage = 0
     var bonusHp = 0
     var bonusRegen = 0
     var bonusAttack = 0
@@ -22,13 +24,15 @@ open class HeroType : UnitType() {
     val recommendedRuneConfigs = mutableListOf<RuneConfig>()
     val runeConfig = RuneConfig()
     val skins = mutableListOf<Skin>()
-    open val preferredIcon get() = skins.last().icon
+    open val preferredIcon get() = if (skins.size >= 2) skins[1].icon else skins[0].icon
     val attackAbilities = mutableListOf<Ability>()
-    val abilities = IntArray(4)
-    open fun passiveSpeed(level: Int) = 0
+    val abilities = Array(4) { Ability() }
+    open val learn = IntArray(0)
+    open val passiveSpeed = 0
     open val passiveSpeedName get() = attackAbilities[0].name
     open fun tempSpeed(level: Int) = 0
     open val tempSpeedName = ""
+    open val specialAttackName = ""
 
     fun applyEquipConfig(index: Int = 0) {
         equipConfigs[index]?.equips?.copyInto(equips)
@@ -42,15 +46,33 @@ open class HeroType : UnitType() {
         attackAbilities.forEach(Ability::initSpeeds)
     }
 
+    open fun updateSpecificAttributes(hero: Hero) {}
+
     open fun attackFrames(speed: Int, index: Int = 0) = attackAbilities[index].attackFrames(speed)
 
-    open fun onAction(time: Int, actor: Hero, target: Hero) {
-        if (time >= actor.nextAttackTime) doAttack(time, actor, target)
+    open fun onAction(actor: Hero, target: Hero) {
+        if (actor.attackOnTime()) doAttack(actor, target)
     }
 
-    open fun doAttack(time: Int, actor: Hero, target: Hero) {
+    open fun doAttack(actor: Hero, target: Hero) {
+        val time = target.battle.time
         actor.nextAttackTime = time + attackFrames(actor.attackSpeed) * GameData.MS_FRAME
-        actor.battle.events += Event(time + GameData.MS_FRAME, target, actor)
+        actor.battle.events += Event(time + GameData.MS_FRAME * if (attackType == RANGE) 2 else 1, target, actor)
+    }
+
+    fun doCast(actor: Hero, target: Hero, index: Int) {
+        val time = target.battle.time
+        val ability = abilities[index]
+        val cd = (ability.cd + ability.bonusCd * (actor.abilityLevels[index] - 1)) * (1000 - actor.cdr) / 1000
+        actor.nextCastTime[index] = time + cd
+        if (actor.enchant != null && time >= actor.nextEnchantTime) {
+            actor.nextEnchantTime = time + 2000
+            actor.enchanting = true
+        }
+        when (ability.type) {
+            Ability.TYPE_BUFF -> actor.addBuff(ability)
+            else -> actor.battle.events += Event(time + GameData.MS_FRAME * 2, target, actor, ability)
+        }
     }
 
     override fun toString() = toJson()

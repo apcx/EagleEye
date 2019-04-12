@@ -26,8 +26,8 @@ class Battle() {
         heroes.forEach(Hero::reset)
         while (time < 90_000 && forces.sumBy { force -> if (force.any { it.hp > 0 }) 1 else 0 } >= 2) {
             if (regenEvents.isEmpty() && heroes.any { it.mhp - it.hp >= it.regen }) {
-                val firstRegen = time - GameData.MS_FRAME + 1
-                regenEvents += heroes.map { Event(firstRegen, it, Regen, 5_000) }
+                val firstRegen = time - GameData.MS_FRAME + 2
+                regenEvents += heroes.map { Event(firstRegen, it, Regen, 5000) }
             }
 
             regenEvents.filter(::ready).forEach { it.onTick(time) }
@@ -38,7 +38,7 @@ class Battle() {
             liveHeroes.filter { it.active }.forEach { hero ->
                 if (hero.hp > 0) {
                     liveHeroes.filter { it.force != hero.force && it.hp > 0 }.sortedBy { it.hp }.firstOrNull()
-                        ?.let { hero.onAction(time, it) }
+                        ?.let(hero::onAction)
                 }
             }
             time += GameData.MS_FRAME

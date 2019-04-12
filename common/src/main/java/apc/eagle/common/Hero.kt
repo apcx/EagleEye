@@ -4,12 +4,21 @@ import kotlin.math.min
 
 class Hero(val type: HeroType) {
 
-    val equips get() = type.equips.map(Int::toEquip).filterNotNull()
     var level = 15
+    private val equips get() = type.equips.map(Int::toEquip).filterNotNull()
+    val abilityLevels = IntArray(4)
     var baseAttackSpeed = 0
     var auraSpeed = 0
-    val expectedSpeed get() = baseAttackSpeed + auraSpeed + type.passiveSpeed(level)
-    val attackSpeed get() = baseAttackSpeed + auraSpeed + type.passiveSpeed(level) + tempSpeed
+    val expectedSpeed get() = baseAttackSpeed + auraSpeed + type.passiveSpeed
+    val attackSpeed get() = baseAttackSpeed + auraSpeed
+
+    val criticalDamageRuneBonus get() = (critical + 7) * (criticalDamage + 36) - (critical * criticalDamage + 7 * 1000)
+    val criticalRuneBonus get() = 16 * (criticalDamage - 1000)
+
+    private fun critical(attack: Int) = attack * (critical * criticalDamage + (1000 - critical) * 1000) / 1000_000
+    var avgAttack = IntArray(2)
+    fun avgAttack(ability: Ability = type.attackAbilities[0]) =
+        critical(attack * ability.attackFactor / 100 + expertise) + ability.extraDamage
 
     var mhp = 0
     var regen = 50
@@ -27,6 +36,7 @@ class Hero(val type: HeroType) {
     var magicDefense = 0
     var magicPenetrate = 0
     var magicPenetrateRate = 0
+    var cdr = 0
     var hasCorrupt = false
     var hasLightning = false
     var hasStorm = false
@@ -38,7 +48,6 @@ class Hero(val type: HeroType) {
     var active = false
     var hp = 0
     var magicShield = 0
-    var tempSpeed = 0
     var attackIndex = 0
     var nextAttackTime = 0
     private var criticalRage = 0f
@@ -46,6 +55,8 @@ class Hero(val type: HeroType) {
     var nextLightningTime = 0
     var lightningRage = 0
     var nextEnchantTime = 0
+    var enchanting = false
+    var heroRage = 0
 
     init {
         updateAttributes()
@@ -63,12 +74,13 @@ class Hero(val type: HeroType) {
         defense = type.baseDefense + type.bonusDefense * bonusLevel / 10000
         penetrate = 0
         penetrateRate = 0
-        critical = 0
-        criticalDamage = 2000
+        critical = type.baseCritical
+        criticalDamage = 1000 + type.baseCriticalDamage
         magic = 0
         magicDefense = 50 + type.bonusMagicDefense * bonusLevel / 10000
         magicPenetrate = 0
         magicPenetrateRate = 0
+        cdr = 0
         enchant = null
 
         val equips = equips
@@ -81,6 +93,7 @@ class Hero(val type: HeroType) {
             critical += it.critical
             magic += it.magic
             magicDefense += it.magicDefense
+            cdr += it.cdr
         }
         hasCorrupt = equips.has("末世")
         hasLightning = equips.has("闪电匕首")
@@ -123,6 +136,7 @@ class Hero(val type: HeroType) {
         magic += rune.magic / 100
         magicDefense += rune.magicDefense / 100
         magicPenetrate += rune.magicPenetrate / 100
+        cdr += rune.cdr
 
         when (type.skins.last().type) {
             Skin.TYPE_ATTACK -> extraAttack += 10
@@ -130,19 +144,29 @@ class Hero(val type: HeroType) {
             Skin.TYPE_HP -> mhp += 120
         }
         if (equips.has("破魔刀")) magicDefense += min(attack * 40 / 100, 300)
+        if (cdr > 400) cdr = 400
+
+        if (type.learn.isNotEmpty()) {
+            abilityLevels.fill(0)
+            for (level in 1..level) ++abilityLevels[type.learn[level - 1] - 1]
+        }
+        type.updateSpecificAttributes(this)
     }
 
     private fun Iterable<Equip>.has(name: String) = any { it.name == name }
 
     fun reset() {
+        updateAttributes()
         hp = mhp
-        tempSpeed = 0
         nextAttackTime = 0
         criticalRage = 0f
         nextCastTime.fill(0)
         nextLightningTime = 0
         lightningRage = 0
-        magicShield = if (equips.has("魔女斗篷")) 2000 else 0
+        nextEnchantTime = 0
+        enchanting = false
+        magicShield = if (equips.has("魔女斗篷")) 200 + level * 120 else 0
+        heroRage = 0
     }
 
     fun criticalDamage(damage: Int, factor: Float): Int {
@@ -151,27 +175,47 @@ class Hero(val type: HeroType) {
         return if (criticalRage >= cost) {
             criticalRage -= cost
             battle.logs.last().critical = true
-            if (hasStorm && addBuff(Storm)) tempSpeed += 300
+            if (hasStorm) addBuff(Storm)
             damage * criticalDamage / 1000
         } else {
             damage
         }
     }
 
-    fun addBuff(ability: Ability): Boolean {
-        val event = battle.events.find { it.target == this && it.ability == ability }
-        return if (event == null) {
-            val log = Event(this, ability)
-            battle.logs += log
-            battle.events += log.clone()
+    fun buff(ability: Ability) = battle.events.find { it.target == this && it.ability == ability }
+
+    fun addBuff(ability: Ability) {
+        var buff = buff(ability)
+        val add = if (buff == null) {
+            buff = Event(this, ability)
+
+            val event = buff.clone()
+            event.type = Event.TYPE_OFF
+            event.time = battle.time + ability.duration
+            battle.events += event
             true
         } else {
-            event.time = battle.time + ability.duration
-            false
+            buff.time = battle.time + ability.duration
+            if (buff.stacks < ability.maxStacks) {
+                ++buff.stacks
+
+                buff = buff.clone()
+                buff.type = Event.TYPE_ON
+                true
+            } else {
+                false
+            }
+        }
+        if (add) {
+            ability.on(this)
+            battle.logs += buff
         }
     }
 
-    fun onAction(time: Int, target: Hero) {
-        type.onAction(time, this, target)
+    fun onAction(target: Hero) {
+        type.onAction(this, target)
     }
+
+    fun attackOnTime() = battle.time >= nextAttackTime
+    fun abilityOnTime(index: Int) = battle.time >= nextCastTime[index] && abilityLevels[index] > 0
 }

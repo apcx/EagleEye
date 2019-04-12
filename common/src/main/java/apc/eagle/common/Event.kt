@@ -1,30 +1,34 @@
 package apc.eagle.common
 
+import apc.eagle.common.hero.BurnSoul
+import apc.eagle.common.hero.RetributionShot
 import kotlin.math.max
 import kotlin.math.min
 
 class Event(var time: Int, val target: Hero, var type: Int) : Cloneable {
 
-    var ticks = 1
-    var period = 0
+    private var ticks = 1
+    private var period = 0
+    var stacks = 1
     lateinit var attacker: Hero
     lateinit var ability: Ability
+    var abilityFactor = 100
 
     var damage = 0
     var critical = false
-    var hp = 0
+    var hp = -1
 
-    constructor(time: Int, target: Hero, attacker: Hero, ability: Ability = attacker.type.attackAbilities[0])
-            : this(time, target, TYPE_HIT) {
+    constructor(
+        time: Int, target: Hero, attacker: Hero, ability: Ability = attacker.type.attackAbilities[0],
+        abilityFactor: Int = 100
+    ) : this(time, target, TYPE_HIT) {
         this.attacker = attacker
         this.ability = ability
+        this.abilityFactor = abilityFactor
     }
 
-    constructor(time: Int, target: Hero, ability: Ability, period: Int, ticks: Int = 0) : this(
-        time,
-        target,
-        TYPE_REGEN
-    ) {
+    constructor(time: Int, target: Hero, ability: Ability, period: Int, ticks: Int = 0)
+            : this(time, target, TYPE_REGEN) {
         this.ability = ability
         this.ticks = ticks
         this.period = period
@@ -34,14 +38,7 @@ class Event(var time: Int, val target: Hero, var type: Int) : Cloneable {
         this.ability = ability
     }
 
-    public override fun clone() = (super.clone() as Event).also {
-        if (type == TYPE_ON) {
-            it.type = TYPE_OFF
-            it.time = target.battle.time + ability.duration
-        } else {
-            it.time = target.battle.time
-        }
-    }
+    public override fun clone() = (super.clone() as Event).also { it.time = target.battle.time }
 
     fun onTick(now: Int): Boolean {
         if (target.hp > 0) {
@@ -60,12 +57,8 @@ class Event(var time: Int, val target: Hero, var type: Int) : Cloneable {
                 TYPE_HIT -> {
                     val hitLog = clone()
                     target.battle.logs += hitLog
-                    var damage = ability.damage(attacker, target)
+                    var damage = ability.damage(attacker, target, abilityFactor)
                     hitLog.damage = damage
-                    when (target.ironSpeed) {
-                        300 -> if (attacker.addBuff(Iron30)) attacker.tempSpeed -= target.ironSpeed
-                        150 -> if (attacker.addBuff(Iron15)) attacker.tempSpeed -= target.ironSpeed
-                    }
                     if (ability.type == Ability.TYPE_MAGIC && target.magicShield > 0) {
                         val shieldDamage = min(damage, target.magicShield)
                         target.magicShield -= shieldDamage
@@ -77,12 +70,28 @@ class Event(var time: Int, val target: Hero, var type: Int) : Cloneable {
                         }
                         damage -= shieldDamage
                     }
+                    when (target.ironSpeed) {
+                        300 -> attacker.addBuff(Iron30)
+                        150 -> attacker.addBuff(Iron15)
+                    }
+                    when (attacker.type.name) {
+                        "后羿" -> if (ability.canExpertise) attacker.addBuff(RetributionShot)
+                        "黄忠" -> if (ability.canExpertise) attacker.addBuff(BurnSoul)
+                    }
                     target.hp = max(0, target.hp - damage)
-                    target.battle.logs.subList(target.battle.logs.indexOf(hitLog), target.battle.logs.size)
-                        .forEach { it.hp = target.hp }
-                    if (ability.hasOrb) {
-                        if (attacker.hasCorrupt)
-                            target.battle.events += Event(now + GameData.MS_FRAME, target, attacker, Corrupt)
+                    hitLog.hp = target.hp
+                    if (ability.canOrb) {
+                        if (attacker.hasCorrupt) {
+                            val event = target.buff(Corrupt)
+                            if (event == null)
+                                target.battle.events += Event(now + GameData.MS_FRAME, target, attacker, Corrupt)
+                            else
+                                event.time = now + GameData.MS_FRAME
+                        }
+                        if (attacker.enchanting) {
+                            attacker.enchanting = false
+                            target.battle.events += Event(now + GameData.MS_FRAME, target, attacker, attacker.enchant!!)
+                        }
                         if (attacker.hasLightning && now >= attacker.nextLightningTime) {
                             attacker.lightningRage += 30
                             if (attacker.lightningRage >= 100) {
@@ -92,29 +101,10 @@ class Event(var time: Int, val target: Hero, var type: Int) : Cloneable {
                             }
                         }
                     }
-//                    if (ability.isSpell) { // todo: move to casting moment
-//                        val enchant = attacker.enchant
-//                        if (enchant != null && now >= attacker.nextEnchantTime) {
-//                            attacker.nextEnchantTime += now + 2_000
-//                            target.battle.events += Event(now + GameData.MS_FRAME, target, attacker, enchant)
-//                        }
-//                    }
                 }
                 TYPE_OFF -> {
-                    when (ability) {
-                        Storm -> {
-                            target.tempSpeed -= 300
-                            target.battle.logs += this
-                        }
-                        Iron30 -> {
-                            target.tempSpeed += 300
-                            target.battle.logs += this
-                        }
-                        Iron15 -> {
-                            target.tempSpeed += 150
-                            target.battle.logs += this
-                        }
-                    }
+                    ability.off(target, stacks)
+                    target.battle.logs += this
                 }
             }
         }

@@ -75,7 +75,7 @@ class RuneInfo : BaseRowModel() {
             "暴击率" -> critical = value / 1000
             "暴击效果" -> criticalDamage = value / 1000
             "法术攻击力" -> magic = value
-            "冷却缩减" -> cdr = value
+            "冷却缩减" -> cdr = value / 1000
             "物理防御力" -> defense = value
             "法术防御力" -> magicDefense = value
             "物理护甲穿透" -> penetrate = value

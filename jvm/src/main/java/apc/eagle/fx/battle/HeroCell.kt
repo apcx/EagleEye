@@ -18,7 +18,6 @@ internal class HeroCell : TableCell<Event, Number>() {
 
     override fun updateItem(id: Number?, empty: Boolean) {
         super.updateItem(id, empty)
-//        if (id != null) (graphic as ImageView).image = if (id == 0) null else Image("head/$id.png")
-        if (id != null) (graphic as ImageView).image = Image("equip/1111.png")
+        (graphic as ImageView).image = if (id == null || id == 0) null else Image("head/$id.png")
     }
 }
