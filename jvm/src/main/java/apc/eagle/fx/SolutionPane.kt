@@ -36,18 +36,18 @@ class SolutionPane : VBox() {
             column
         }
 
-        val speedColumn = TableColumn<HeroType, String>("攻击速度 - 帧数")
-        speedColumn.setCellValueFactory {
+        val hasteColumn = TableColumn<HeroType, String>("攻击速度 - 帧数")
+        hasteColumn.setCellValueFactory {
             val type = it.value
             val hero = Hero(type)
-            val speed = min(hero.expectedSpeed, 2000)
-            SimpleStringProperty("${"%.1f".format(speed / 10f)} - ${type.attackFrames(speed)}")
+            val haste = min(hero.expectedHaste, 2000)
+            SimpleStringProperty("${"%.1f".format(haste / 10f)} - ${type.attackFrames(haste)}")
         }
-        speedColumn.center()
+        hasteColumn.center()
 
         val table = TableView<HeroType>()
         table.columnResizePolicy = TableView.UNCONSTRAINED_RESIZE_POLICY
-        table.columns.setAll(name, *equips, column(Rune.BLUE), column(Rune.GREEN), column(Rune.RED), speedColumn)
+        table.columns.setAll(name, *equips, column(Rune.BLUE), column(Rune.GREEN), column(Rune.RED), hasteColumn)
         table.setRowFactory {
             val row = TableRow<HeroType>()
             row.onMouseClicked = EventHandler<MouseEvent> { event ->

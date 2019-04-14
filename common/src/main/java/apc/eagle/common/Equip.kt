@@ -14,7 +14,7 @@ class Equip {
     var hp = 0
     var regen = 0
     var attack = 0
-    var attackSpeed = 0
+    var haste = 0
     var critical = 0
     var magic = 0
     var cdr = 0

@@ -30,9 +30,9 @@ class Battle() {
                 regenEvents += heroes.map { Event(firstRegen, it, Regen, 5000) }
             }
 
-            regenEvents.filter(::ready).forEach { it.onTick(time) }
+            regenEvents.filter(::ready).forEach { it.onTick() }
             events.filter(::ready).sortedBy { it.time }
-                .forEach { if (it.onTick(time) || it.target.hp <= 0) events -= it }
+                .forEach { if (it.onTick() || it.target.hp <= 0) events -= it }
 
             val liveHeroes = heroes.filter { it.hp > 0 }
             liveHeroes.filter { it.active }.forEach { hero ->

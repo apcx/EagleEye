@@ -2,6 +2,7 @@ package apc.eagle.common
 
 import apc.eagle.common.hero.BurnSoul
 import apc.eagle.common.hero.RetributionShot
+import apc.eagle.common.hero.Wound
 import kotlin.math.max
 import kotlin.math.min
 
@@ -19,7 +20,7 @@ class Event(var time: Int, val target: Hero, var type: Int) : Cloneable {
     var hp = -1
 
     constructor(
-        time: Int, target: Hero, attacker: Hero, ability: Ability = attacker.type.attackAbilities[0],
+        time: Int, target: Hero, attacker: Hero, ability: Ability = attacker.type.attackAbilities[attacker.attackIndex],
         abilityFactor: Int = 100
     ) : this(time, target, TYPE_HIT) {
         this.attacker = attacker
@@ -40,8 +41,9 @@ class Event(var time: Int, val target: Hero, var type: Int) : Cloneable {
 
     public override fun clone() = (super.clone() as Event).also { it.time = target.battle.time }
 
-    fun onTick(now: Int): Boolean {
+    fun onTick(): Boolean {
         if (target.hp > 0) {
+            val now = target.battle.time
             when (type) {
                 TYPE_REGEN -> {
                     val hurt = target.mhp - target.hp
@@ -59,52 +61,60 @@ class Event(var time: Int, val target: Hero, var type: Int) : Cloneable {
                     target.battle.logs += hitLog
                     var damage = ability.damage(attacker, target, abilityFactor)
                     hitLog.damage = damage
-                    if (ability.type == Ability.TYPE_MAGIC && target.magicShield > 0) {
-                        val shieldDamage = min(damage, target.magicShield)
-                        target.magicShield -= shieldDamage
-                        if (target.magicShield <= 0) {
-                            val log = Event(target.battle.time, target, TYPE_OFF)
-                            log.ability = Ability("迷雾", Ability.TYPE_BUFF)
-                            log.ability.tipOff = "护盾击破"
-                            target.battle.logs += log
-                        }
-                        damage -= shieldDamage
+                    if (attacker.type.name == "伽罗" && (ability.canExpertise || ability == Wound)) {
+                        val descriptionDamage = ability.descriptionDamage(attacker)
+                        target.onHitShield(Hero::magicShield, descriptionDamage, "魔女斗篷")
+                        target.onHitShield(Hero::standShield, descriptionDamage, "血魔之怒")
                     }
+                    if (ability.type == Ability.TYPE_MAGIC) damage = target.onHitShield(Hero::magicShield, damage, "魔女斗篷")
+                    if (ability.type != Ability.TYPE_REAL) damage =
+                        target.onHitShield(Hero::standShield, damage, "血魔之怒")
                     when (target.ironSpeed) {
                         300 -> attacker.addBuff(Iron30)
                         150 -> attacker.addBuff(Iron15)
                     }
+                    val events = target.battle.events
                     when (attacker.type.name) {
                         "后羿" -> if (ability.canExpertise) attacker.addBuff(RetributionShot)
                         "黄忠" -> if (ability.canExpertise) attacker.addBuff(BurnSoul)
+                        "伽罗" -> if (ability == attacker.type.attackAbilities[1]) {
+                            events.filter { it.target == target && it.ability == Wound }.forEach { it.time = now + 500 }
+                            events += Event(now + 500, target, attacker, Wound)
+                            events += Event(now + 1000, target, attacker, Wound)
+                            events += Event(now + 1500, target, attacker, Wound)
+                        }
                     }
                     target.hp = max(0, target.hp - damage)
                     hitLog.hp = target.hp
+                    if (target.hasLastStand && now >= target.nextStandTime && target.hp < target.mhp * 30 / 100) {
+                        target.nextStandTime = now + 90_000
+                        target.addBuff(LastStand)
+                    }
                     if (ability.canOrb) {
                         if (attacker.hasCorrupt) {
                             val event = target.buff(Corrupt)
                             if (event == null)
-                                target.battle.events += Event(now + GameData.MS_FRAME, target, attacker, Corrupt)
+                                events += Event(now + GameData.MS_FRAME, target, attacker, Corrupt)
                             else
                                 event.time = now + GameData.MS_FRAME
                         }
                         if (attacker.enchanting) {
                             attacker.enchanting = false
-                            target.battle.events += Event(now + GameData.MS_FRAME, target, attacker, attacker.enchant!!)
+                            events += Event(now + GameData.MS_FRAME, target, attacker, attacker.enchant!!)
                         }
                         if (attacker.hasLightning && now >= attacker.nextLightningTime) {
                             attacker.lightningRage += 30
                             if (attacker.lightningRage >= 100) {
                                 attacker.lightningRage -= 100
                                 attacker.nextLightningTime = now + 500
-                                target.battle.events += Event(now + GameData.MS_FRAME * 2, target, attacker, Lightning)
+                                events += Event(now + GameData.MS_FRAME * 2, target, attacker, Lightning)
                             }
                         }
                     }
                 }
                 TYPE_OFF -> {
                     ability.off(target, stacks)
-                    target.battle.logs += this
+                    if (!ability.channel) target.battle.logs += this
                 }
             }
         }

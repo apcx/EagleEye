@@ -71,7 +71,7 @@ class RuneInfo : BaseRowModel() {
             "最大生命" -> hp = value
             "生命回复" -> regen = value
             "物理攻击力" -> attack = value
-            "攻速加成" -> attackSpeed = value / 1000
+            "攻速加成" -> haste = value / 1000
             "暴击率" -> critical = value / 1000
             "暴击效果" -> criticalDamage = value / 1000
             "法术攻击力" -> magic = value
@@ -88,7 +88,7 @@ class RuneInfo : BaseRowModel() {
 
     companion object : Table<RuneInfo>() {
         override val file = "44.符文信息表_Chad"
-        private val serializer = RuneInfo.serializer()
+        private val serializer = serializer()
         internal val level5Runes = mutableMapOf<Int, Int>()
         override fun invoke(row: RuneInfo, context: AnalysisContext) {
             if (row.enable > 0) {

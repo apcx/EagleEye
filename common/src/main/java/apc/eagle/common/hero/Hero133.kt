@@ -6,7 +6,7 @@ import apc.eagle.common.*
 class Hero133 : HeroType() { // 狄仁杰
 
     override val preferredIcon = 301333
-    override val passiveSpeed = 300
+    override val passiveHaste = 300
     override val learn = intArrayOf(
         1, 2, 1, 3,
         1, 2, 1, 3,
@@ -27,7 +27,7 @@ class Hero133 : HeroType() { // 狄仁杰
         val rage = actor.heroRage
         if (rage % 3 == 0) {
             val card = if (rage % 6 == 0) RedCard else BlueCard
-            actor.battle.events += Event(actor.battle.time + GameData.MS_FRAME * 2, target, actor, card)
+            actor.battle.events += Event(actor.battle.time + GameData.MS_FRAME * 5, target, actor, card)
         }
     }
 }
@@ -42,10 +42,10 @@ object Haste : Ability("迅捷", TYPE_BUFF) {
     }
 
     override fun on(hero: Hero) {
-        hero.baseAttackSpeed += 60
+        hero.baseHaste += 60
     }
 
     override fun off(hero: Hero, stacks: Int) {
-        hero.baseAttackSpeed -= 60 * stacks
+        hero.baseHaste -= 60 * stacks
     }
 }

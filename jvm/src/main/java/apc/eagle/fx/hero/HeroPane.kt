@@ -165,10 +165,10 @@ class HeroPane(private val type: HeroType) : VBox(4.0) {
     private fun update() {
         hero.updateAttributes()
         val level = hero.level
-        val passiveSpeed = type.passiveSpeed
-        if (passiveSpeed > 0) {
+        val passiveHaste = type.passiveHaste
+        if (passiveHaste > 0) {
             passiveLabel.isVisible = true
-            passiveLabel.text = "${type.passiveSpeedName}\n攻速+${passiveSpeed / 10}%"
+            passiveLabel.text = "${type.passiveHasteName}\n攻速+${passiveHaste / 10}%"
         } else {
             passiveLabel.isVisible = false
         }
@@ -181,10 +181,10 @@ class HeroPane(private val type: HeroType) : VBox(4.0) {
         }
         extraLabel.text = "+${hero.extraAttack}"
 
-        val speed = hero.expectedSpeed
+        val haste = hero.expectedHaste
         val storm = type.attackAbilities[0].canCritical && 1136 in hero.type.equips
-        xAxis.label = "攻速加成 +${speed / 10f}%"
-        attackCurves.forEach { it.update(speed, storm, level) }
+        xAxis.label = "攻速加成 +${haste / 10f}%"
+        attackCurves.forEach { it.update(haste, storm, level) }
     }
 
     private fun Int.toPercent() = "+%.4f%%".format(this / 10000f)

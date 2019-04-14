@@ -11,7 +11,7 @@ open class Ability() {
     var bonusCd = 0
 
     var swing = 2
-    var speedModel = 0
+    var hasteModel = 0
     lateinit var speeds: IntArray
 
     var attackFactor = 0
@@ -26,6 +26,7 @@ open class Ability() {
     var omegaCritical = false
     var canOrb = false
     var isSpell = false
+    var channel = false
 
     var duration = 0
     var maxStacks = 1
@@ -73,9 +74,10 @@ open class Ability() {
         return frames
     }
 
-    internal fun attackFrames(speed: Int) = SpeedModel[speedModel]?.frames(speed) ?: rawFrames(speed) + swing
+    internal fun attackFrames(haste: Int) = HasteModel[hasteModel]?.frames(haste) ?: rawFrames(haste) + swing
 
-    fun damage(attacker: Hero, target: Hero, abilityFactor: Int): Int {
+    fun descriptionDamage(attacker: Hero) = attacker.attack * attackFactor / 100 + extraDamage
+    open fun damage(attacker: Hero, target: Hero, abilityFactor: Int): Int {
         var damage = attacker.attack * attackFactor / 100
         if (canExpertise) damage += attacker.expertise
         var factor = defenseFactor(attacker, target) * abilityFactor / 100
@@ -90,7 +92,7 @@ open class Ability() {
         return (damage * factor).toInt()
     }
 
-    private fun defenseFactor(attacker: Hero, target: Hero) = when (type) {
+    protected fun defenseFactor(attacker: Hero, target: Hero) = when (type) {
         TYPE_PHYSICAL -> {
             val defense = max(0, target.defense - attacker.penetrate)
             600f / (600 + defense * (100 - attacker.penetrateRate) / 100)
@@ -117,13 +119,13 @@ open class Ability() {
     }
 }
 
-object Corrupt : Ability("破败", TYPE_PHYSICAL) {
+object Corrupt : Ability("末世", TYPE_PHYSICAL) {
     init {
         targetHpFactor = 8
     }
 }
 
-object Lightning : Ability("电弧", TYPE_MAGIC) {
+object Lightning : Ability("闪电匕首", TYPE_MAGIC) {
     init {
         attackFactor = 30
         extraDamage = 100
@@ -168,7 +170,7 @@ object Enchant : Ability("光辉之剑", TYPE_MAGIC) {
 
 object Regen : Ability("每5秒回血", TYPE_REGEN)
 
-object Storm : Ability("暴风", TYPE_BUFF) {
+object ShadowEdge : Ability("影刃", TYPE_BUFF) {
 
     init {
         duration = 2000
@@ -176,11 +178,11 @@ object Storm : Ability("暴风", TYPE_BUFF) {
     }
 
     override fun on(hero: Hero) {
-        hero.baseAttackSpeed += 300
+        hero.baseHaste += 300
     }
 
     override fun off(hero: Hero, stacks: Int) {
-        hero.baseAttackSpeed -= 300
+        hero.baseHaste -= 300
     }
 }
 
@@ -192,11 +194,11 @@ object Iron30 : Ability("寒铁", TYPE_DEBUFF) {
     }
 
     override fun on(hero: Hero) {
-        hero.baseAttackSpeed -= 300
+        hero.baseHaste -= 300
     }
 
     override fun off(hero: Hero, stacks: Int) {
-        hero.baseAttackSpeed += 300
+        hero.baseHaste += 300
     }
 }
 
@@ -208,10 +210,39 @@ object Iron15 : Ability("寒铁", TYPE_DEBUFF) {
     }
 
     override fun on(hero: Hero) {
-        hero.baseAttackSpeed -= 150
+        hero.baseHaste -= 150
     }
 
     override fun off(hero: Hero, stacks: Int) {
-        hero.baseAttackSpeed += 150
+        hero.baseHaste += 150
+    }
+}
+
+object LastStand : Ability("血魔之怒", TYPE_BUFF) {
+
+    init {
+        duration = 8000
+        tipOn = "攻击+80"
+    }
+
+    override fun on(hero: Hero) {
+        hero.extraAttack += 80
+        hero.standShield = hero.mhp * 30 / 100
+    }
+
+    override fun off(hero: Hero, stacks: Int) {
+        hero.extraAttack -= 80
+        hero.standShield = 0
+    }
+}
+
+object Channel : Ability("", TYPE_BUFF) {
+
+    init {
+        channel = true
+    }
+
+    override fun off(hero: Hero, stacks: Int) {
+        hero.channeling = false
     }
 }

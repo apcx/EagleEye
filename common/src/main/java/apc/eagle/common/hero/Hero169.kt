@@ -6,7 +6,7 @@ import apc.eagle.common.*
 class Hero169 : HeroType() { // 后羿
 
     override val preferredIcon = 301694
-    override val passiveSpeed = 300
+    override val passiveHaste = 300
     override val specialAttackName get() = abilities[0].name
     override val learn = intArrayOf(
         2, 1, 1, 3,
@@ -45,15 +45,15 @@ class Hero169 : HeroType() { // 后羿
 
     override fun doAttack(actor: Hero, target: Hero) {
         val time = target.battle.time
-        actor.nextAttackTime = time + attackFrames(actor.attackSpeed) * GameData.MS_FRAME
+        actor.nextAttackTime = time + attackFrames(actor.haste) * GameData.MS_FRAME
         val ability = if (actor.buff(abilities[0]) == null) attackAbilities[0] else MultipleShot
         val retribution = actor.buff(RetributionShot)
         if (retribution != null && retribution.stacks >= RetributionShot.maxStacks) {
-            actor.battle.events += Event(time + GameData.MS_FRAME * 2, target, actor, ability, 40)
-            actor.battle.events += Event(time + GameData.MS_FRAME * 4, target, actor, ability, 40)
             actor.battle.events += Event(time + GameData.MS_FRAME * 5, target, actor, ability, 40)
+            actor.battle.events += Event(time + GameData.MS_FRAME * 7, target, actor, ability, 40)
+            actor.battle.events += Event(time + GameData.MS_FRAME * 8, target, actor, ability, 40)
         } else {
-            actor.battle.events += Event(time + GameData.MS_FRAME * 2, target, actor, ability)
+            actor.battle.events += Event(time + GameData.MS_FRAME * 5, target, actor, ability)
         }
     }
 }
@@ -66,11 +66,11 @@ object RetributionShot : Ability("惩戒射击", TYPE_BUFF) {
     }
 
     override fun on(hero: Hero) {
-        hero.baseAttackSpeed += 100
+        hero.baseHaste += 100
     }
 
     override fun off(hero: Hero, stacks: Int) {
-        hero.baseAttackSpeed -= 100 * stacks
+        hero.baseHaste -= 100 * stacks
     }
 }
 

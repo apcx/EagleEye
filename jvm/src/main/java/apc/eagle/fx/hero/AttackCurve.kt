@@ -49,38 +49,38 @@ internal class AttackCurve(private val type: HeroType, private val index: Int) {
         series.data.addAll(dataList)
     }
 
-    internal fun update(speed: Int, storm: Boolean, level: Int) {
+    internal fun update(haste: Int, storm: Boolean, level: Int) {
         val speeds = type.attackAbilities[index].speeds
-        val ironSpeed = speed - 300
+        val ironSpeed = haste - 300
         ironData.update(!storm, ironSpeed, max(0, 1 + speeds.indexOfLast { it <= ironSpeed }) * 2)
 
         val index200 = speeds.size * 2 + 1
-        stormData.update(storm, speed + 300, index200)
+        stormData.update(storm, haste + 300, index200)
 
-        val tempSpeed = type.tempSpeed(level)
-        if (tempSpeed > (if (storm) 300 else 0)) {
-            tempData.update(true, speed + tempSpeed, index200)
-            (tempData.node as Labeled).text = "${type.tempSpeedName}\n+${(tempSpeed / 10)}%"
+        val tempHaste = type.tempHaste(level)
+        if (tempHaste > (if (storm) 300 else 0)) {
+            tempData.update(true, haste + tempHaste, index200)
+            (tempData.node as Labeled).text = "${type.tempHasteName}\n+${(tempHaste / 10)}%"
         } else {
             tempData.update(false, 0, 0)
         }
 
-        series.name = "$name${attackData.update(speed)}帧"
+        series.name = "$name${attackData.update(haste)}帧"
     }
 
-    private fun XYChart.Data<Number, Number>.update(visible: Boolean, speed: Int, index: Int) {
+    private fun XYChart.Data<Number, Number>.update(visible: Boolean, haste: Int, index: Int) {
         if (visible) {
-            update(speed)
+            update(haste)
             Platform.runLater { if (this !in series.data) series.data.add(index, this) }
         } else if (this in series.data) {
             series.data.remove(this)
         }
     }
 
-    private fun XYChart.Data<Number, Number>.update(rawSpeed: Int): Int {
-        val speed = min(rawSpeed, 2000)
-        val y = type.attackFrames(speed, index)
-        xValue = speed / 10f
+    private fun XYChart.Data<Number, Number>.update(rawHaste: Int): Int {
+        val haste = min(rawHaste, 2000)
+        val y = type.attackFrames(haste, index)
+        xValue = haste / 10f
         yValue = y
         return y
     }

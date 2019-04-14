@@ -22,7 +22,7 @@ class RuneConfig {
         runes.forEach {
             hp += it.first.hp * it.second
             regen += it.first.regen * it.second
-            attackSpeed += it.first.attackSpeed * it.second
+            haste += it.first.haste * it.second
             attack += it.first.attack * it.second
             defense += it.first.defense * it.second
             penetrate += it.first.penetrate * it.second

@@ -15,7 +15,7 @@ open class HeroType : UnitType() {
     var bonusHp = 0
     var bonusRegen = 0
     var bonusAttack = 0
-    var bonusAttackSpeed = 0
+    var bonusHaste = 0
     var bonusDefense = 0
     var bonusMagicDefense = 0
     val equipConfigs = Array<EquipConfig?>(6) { null }
@@ -28,10 +28,10 @@ open class HeroType : UnitType() {
     val attackAbilities = mutableListOf<Ability>()
     val abilities = Array(4) { Ability() }
     open val learn = IntArray(0)
-    open val passiveSpeed = 0
-    open val passiveSpeedName get() = attackAbilities[0].name
-    open fun tempSpeed(level: Int) = 0
-    open val tempSpeedName = ""
+    open val passiveHaste = 0
+    open val passiveHasteName get() = attackAbilities[0].name
+    open fun tempHaste(level: Int) = 0
+    open val tempHasteName = ""
     open val specialAttackName = ""
 
     fun applyEquipConfig(index: Int = 0) {
@@ -48,7 +48,7 @@ open class HeroType : UnitType() {
 
     open fun updateSpecificAttributes(hero: Hero) {}
 
-    open fun attackFrames(speed: Int, index: Int = 0) = attackAbilities[index].attackFrames(speed)
+    open fun attackFrames(haste: Int, index: Int = 0) = attackAbilities[index].attackFrames(haste)
 
     open fun onAction(actor: Hero, target: Hero) {
         if (actor.attackOnTime()) doAttack(actor, target)
@@ -56,22 +56,22 @@ open class HeroType : UnitType() {
 
     open fun doAttack(actor: Hero, target: Hero) {
         val time = target.battle.time
-        actor.nextAttackTime = time + attackFrames(actor.attackSpeed) * GameData.MS_FRAME
-        actor.battle.events += Event(time + GameData.MS_FRAME * if (attackType == RANGE) 2 else 1, target, actor)
+        actor.nextAttackTime = time + attackFrames(actor.haste) * GameData.MS_FRAME
+        actor.battle.events += Event(time + GameData.MS_FRAME * if (attackType == RANGE) 5 else 1, target, actor)
     }
 
-    fun doCast(actor: Hero, target: Hero, index: Int) {
+    open fun doCast(actor: Hero, target: Hero, index: Int) {
         val time = target.battle.time
         val ability = abilities[index]
         val cd = (ability.cd + ability.bonusCd * (actor.abilityLevels[index] - 1)) * (1000 - actor.cdr) / 1000
         actor.nextCastTime[index] = time + cd
-        if (actor.enchant != null && time >= actor.nextEnchantTime) {
+        if (actor.enchant != null && time >= actor.nextEnchantTime && ability.isSpell) {
             actor.nextEnchantTime = time + 2000
             actor.enchanting = true
         }
         when (ability.type) {
             Ability.TYPE_BUFF -> actor.addBuff(ability)
-            else -> actor.battle.events += Event(time + GameData.MS_FRAME * 2, target, actor, ability)
+            else -> actor.battle.events += Event(time + GameData.MS_FRAME * 5, target, actor, ability)
         }
     }
 

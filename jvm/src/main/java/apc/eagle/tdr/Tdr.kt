@@ -1,6 +1,6 @@
 package apc.eagle.tdr
 
-import apc.eagle.common.SpeedModel
+import apc.eagle.common.HasteModel
 import java.nio.file.Paths
 
 fun main(args: Array<String>) {
@@ -24,6 +24,6 @@ object Tdr {
         ProEquipments.load()
         RecommendedRuneConfig.load()
         AbilityInfo.load()
-        SpeedModel.initHeroes()
+        HasteModel.initHeroes()
     }
 }

@@ -44,7 +44,7 @@ class Equipment : BaseRowModel() {
     var attack = 0
 
     @ExcelProperty(index = 31)
-    var attackSpeed = 0
+    var haste = 0
 
     @ExcelProperty(index = 32)
     var critical = 0
@@ -80,7 +80,7 @@ class Equipment : BaseRowModel() {
         it.top = top
         it.level = level
         it.attack = attack
-        it.attackSpeed = attackSpeed / 10
+        it.haste = haste / 10
         it.critical = critical / 10
         it.magic = magic
         it.cdr = cdr / 10
@@ -93,7 +93,7 @@ class Equipment : BaseRowModel() {
 
     companion object : Table<Equipment>() {
         override val file = "94.装备库表_elu"
-        private val serializer = Equipment.serializer()
+        private val serializer = serializer()
         private val names = mutableSetOf<String>()
         override fun invoke(row: Equipment, context: AnalysisContext) {
             if (row.mode == 0 && row.disable == 0 && row.price > 0 && row.name !in names) {

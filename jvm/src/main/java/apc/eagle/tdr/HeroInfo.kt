@@ -27,7 +27,7 @@ class HeroInfo : BaseRowModel() {
     var bonusRegen = 0
 
     @ExcelProperty("成长攻击速度", index = 61)
-    var bonusAttackSpeed = 0
+    var bonusHaste = 0
 
     @ExcelProperty("基础生命", index = 62)
     var baseHp = 0
@@ -96,7 +96,7 @@ class HeroInfo : BaseRowModel() {
         type.bonusHp = bonusHp
         type.bonusRegen = bonusRegen
         type.bonusAttack = bonusAttack
-        type.bonusAttackSpeed = bonusAttackSpeed / 100000
+        type.bonusHaste = bonusHaste / 100000
         type.bonusDefense = bonusDefense
         type.bonusMagicDefense = bonusMagicDefense
         type.defaultRuneConfig = runeConfig
@@ -106,7 +106,7 @@ class HeroInfo : BaseRowModel() {
 
     companion object : Table<HeroInfo>() {
         override val file = "11.英雄信息表_Xavier"
-        private val serializer = HeroInfo.serializer()
+        private val serializer = serializer()
         override fun invoke(row: HeroInfo, context: AnalysisContext) {
             if (row.id in HeroEnable.ids && row.id !in HeroType.idMap) {
                 val type = row.toType()

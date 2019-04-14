@@ -13,7 +13,7 @@ class Rune {
     var hp = 0
     var regen = 0
     var attack = 0
-    var attackSpeed = 0
+    var haste = 0
     var critical = 0
     var criticalDamage = 0
     var magic = 0
