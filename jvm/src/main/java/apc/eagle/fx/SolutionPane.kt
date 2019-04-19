@@ -2,7 +2,7 @@ package apc.eagle.fx
 
 import apc.common.center
 import apc.common.plus
-import apc.common.startStage
+import apc.common.window
 import apc.eagle.common.Hero
 import apc.eagle.common.HeroType
 import apc.eagle.common.Rune
@@ -13,11 +13,14 @@ import javafx.beans.property.SimpleStringProperty
 import javafx.event.EventHandler
 import javafx.geometry.Insets
 import javafx.geometry.Pos
+import javafx.scene.Scene
 import javafx.scene.control.*
 import javafx.scene.control.cell.PropertyValueFactory
 import javafx.scene.input.MouseEvent
 import javafx.scene.layout.HBox
 import javafx.scene.layout.VBox
+import javafx.stage.Stage
+import javafx.stage.StageStyle
 import kotlin.math.min
 
 class SolutionPane : VBox() {
@@ -53,8 +56,23 @@ class SolutionPane : VBox() {
             row.onMouseClicked = EventHandler<MouseEvent> { event ->
                 if (event.clickCount == 2) {
                     val type = row.item
-                    startStage("${type.name} 攻速档位", HeroPane(type))
-                    table.refresh()
+                    val key = type.name
+                    var pane = HeroPane[key]
+                    if (pane == null) {
+                        pane = HeroPane(type)
+                        HeroPane[key] = pane
+                        val stage = Stage(StageStyle.UTILITY)
+                        stage.title = "${type.name} 攻速档位"
+                        stage.scene = Scene(pane)
+                        stage.sizeToScene()
+                        stage.setOnCloseRequest {
+                            table.refresh()
+                            HeroPane -= key
+                        }
+                        stage.show()
+                    } else {
+                        pane.window.requestFocus()
+                    }
                 }
             }
             row

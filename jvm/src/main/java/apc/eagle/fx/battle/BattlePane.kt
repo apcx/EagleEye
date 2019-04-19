@@ -3,8 +3,10 @@ package apc.eagle.fx.battle
 import apc.common.center
 import apc.common.plus
 import apc.common.right
-import apc.eagle.common.*
+import apc.eagle.common.Battle
+import apc.eagle.common.Event
 import apc.eagle.common.Event.Companion.TYPE_HIT
+import apc.eagle.common.Hero
 import javafx.beans.property.SimpleIntegerProperty
 import javafx.beans.property.SimpleObjectProperty
 import javafx.beans.property.SimpleStringProperty
@@ -15,20 +17,26 @@ import javafx.scene.control.TableColumn
 import javafx.scene.control.TableView
 import javafx.scene.control.cell.PropertyValueFactory
 import javafx.scene.layout.VBox
+import javafx.scene.text.Text
 
-class BattlePane(type: HeroType) : VBox() {
+class BattlePane(attacker: Hero, defender: Hero) : VBox(4.0) {
 
     private val table = TableView<Event>()
 
     init {
-        val target = Hero("吕布".toHero()!!)
-        val battle = Battle(Hero(type), target)
-        val button = Button("攻击吕布\nHP : ${target.mhp}")
-        button.padding = Insets(16.0)
-        button.setOnAction { table.items.setAll(battle.fight()) }
+        val battle = Battle(attacker, defender)
+        val hp = Text()
 
+        val button = Button("${attacker.type.name} 攻击 ${defender.type.name}")
+        button.padding = Insets(16.0)
+        button.setOnAction {
+            table.items.setAll(battle.fight())
+            hp.text = "HP: ${defender.mhp}"
+        }
+
+        padding = Insets(2.0)
         alignment = Pos.TOP_CENTER
-        this + button + initTable()
+        this + button + hp + initTable()
     }
 
     private fun initTable() = table.apply {
@@ -71,6 +79,7 @@ class BattlePane(type: HeroType) : VBox() {
         setPrefSize(600.0, 600.0)
         columnResizePolicy = TableView.UNCONSTRAINED_RESIZE_POLICY
         columns.setAll(time, hero, ability, target, damage, hp)
-        items.setAll()
     }
+
+    companion object : HashMap<String, BattlePane>()
 }

@@ -1,13 +1,7 @@
 package apc.eagle.fx.hero
 
-import apc.common.IntSlider
-import apc.common.border
-import apc.common.plus
-import apc.common.startStage
-import apc.eagle.common.Hero
-import apc.eagle.common.HeroType
-import apc.eagle.common.Skin
-import apc.eagle.common.toEquip
+import apc.common.*
+import apc.eagle.common.*
 import apc.eagle.fx.battle.BattlePane
 import apc.eagle.fx.equip.EquipButton
 import apc.eagle.fx.equip.EquipPane
@@ -16,6 +10,7 @@ import apc.eagle.fx.rune.RunePane
 import javafx.geometry.Insets
 import javafx.geometry.Pos
 import javafx.scene.Node
+import javafx.scene.Scene
 import javafx.scene.chart.AreaChart
 import javafx.scene.chart.NumberAxis
 import javafx.scene.control.Button
@@ -27,6 +22,8 @@ import javafx.scene.layout.GridPane
 import javafx.scene.layout.HBox
 import javafx.scene.layout.VBox
 import javafx.scene.text.Text
+import javafx.stage.Stage
+import javafx.stage.StageStyle
 
 class HeroPane(private val type: HeroType) : VBox(4.0) {
 
@@ -63,7 +60,32 @@ class HeroPane(private val type: HeroType) : VBox(4.0) {
         val head = ImageView("head/${type.preferredIcon}.png")
         head.fitWidth = 64.0
         head.fitHeight = 64.0
-        val box = VBox(4.0, Label(type.name).apply { graphic = head })
+        val button = Button(type.name).copyable()
+        button.graphic = head
+        button.onCopy { string, drop ->
+            val attacker = get(string)
+            if (attacker == null || attacker.type == type) {
+                false
+            } else {
+                if (drop) {
+                    val key = "${attacker.type.name} vs ${type.name}"
+                    var pane = BattlePane[key]
+                    if (pane == null) {
+                        pane = BattlePane(attacker.hero, hero)
+                        BattlePane[key] = pane
+                        val stage = Stage(StageStyle.UTILITY)
+                        stage.scene = Scene(pane)
+                        stage.sizeToScene()
+                        stage.setOnCloseRequest { BattlePane -= key }
+                        stage.show()
+                    } else {
+                        pane.window.requestFocus()
+                    }
+                }
+                true
+            }
+        }
+        val box = VBox(4.0, button)
         box.alignment = Pos.CENTER
         if (type.skins.size >= 2) {
             val skin = when (type.skins.last().type) {
@@ -191,6 +213,8 @@ class HeroPane(private val type: HeroType) : VBox(4.0) {
 
     private fun initBattle() = Button("攻击吕布").apply {
         padding = Insets(16.0)
-        setOnAction { startStage("", BattlePane(type)) }
+        setOnAction { startStage("", BattlePane(hero, Hero("吕布".toHero()!!))) }
     }
+
+    companion object : HashMap<String, HeroPane>()
 }

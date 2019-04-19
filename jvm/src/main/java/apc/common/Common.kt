@@ -30,13 +30,12 @@ inline fun <reified T : Region> T.border() = apply {
     padding = Insets(2.0)
 }
 
-val Node.stage get() = scene.window!!
+val Node.window get() = scene.window!!
 
 fun Window.startStage(title: String, root: Parent) {
-    val stage = Stage()
+    val stage = Stage(StageStyle.UTILITY)
     stage.initOwner(this)
     stage.initModality(Modality.WINDOW_MODAL)
-    stage.initStyle(StageStyle.UTILITY)
     stage.title = title
     stage.scene = Scene(root)
     stage.sizeToScene()
@@ -44,7 +43,7 @@ fun Window.startStage(title: String, root: Parent) {
 }
 
 fun Node.startStage(title: String, root: Parent) {
-    stage.startStage(title, root)
+    window.startStage(title, root)
 }
 
 inline operator fun <reified T : Pane> T.plus(node: Node) = apply { children += node }

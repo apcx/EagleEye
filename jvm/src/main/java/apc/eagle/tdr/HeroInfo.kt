@@ -68,7 +68,7 @@ class HeroInfo : BaseRowModel() {
     @ExcelProperty("英雄面板排序Id", index = 113)
     var order = 0
 
-    @ExcelProperty(index = 131)
+    @ExcelProperty(index = 133)
     var runeConfig = 0
 
     override fun toString() = Json.stringify(serializer, this)

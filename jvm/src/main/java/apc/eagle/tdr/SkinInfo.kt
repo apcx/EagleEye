@@ -58,7 +58,7 @@ class SkinInfo : BaseRowModel() {
     companion object : Table<SkinInfo>() {
         @Suppress("SpellCheckingInspection")
         override val file = "73.皮肤配置表_Liya"
-        private val serializer = SkinInfo.serializer()
+        private val serializer = serializer()
         override fun invoke(row: SkinInfo, context: AnalysisContext) {
             row.hero.toHero()?.run {
                 skins += row.toType()
@@ -73,7 +73,7 @@ class SkinInfo : BaseRowModel() {
         @Suppress("unused")
         private fun copyResources() {
             val icon = Paths.get("D:\\Kings\\trunk0\\UI\\5_Dynamic\\Icon")
-            val res = Paths.get("resources/head")
+            val res = Paths.get("src/main/resources/head")
             res.toFile().mkdirs()
             HeroType.idMap.values.flatMap { it.skins }.forEach {
                 try {

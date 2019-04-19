@@ -52,7 +52,7 @@ internal class AttackCurve(private val type: HeroType, private val index: Int) {
     internal fun update(haste: Int, storm: Boolean, level: Int) {
         val speeds = type.attackAbilities[index].speeds
         val ironSpeed = haste - 300
-        ironData.update(!storm, ironSpeed, max(0, 1 + speeds.indexOfLast { it <= ironSpeed }) * 2)
+        ironData.update(!storm && ironSpeed > 0, ironSpeed, max(0, 1 + speeds.indexOfLast { it <= ironSpeed }) * 2)
 
         val index200 = speeds.size * 2 + 1
         stormData.update(storm, haste + 300, index200)

@@ -13,7 +13,7 @@ class Event(var time: Int, val target: Hero, var type: Int) : Cloneable {
     var stacks = 1
     lateinit var attacker: Hero
     lateinit var ability: Ability
-    var abilityFactor = 100
+    private var abilityFactor = 100
 
     var damage = 0
     var critical = false
@@ -62,11 +62,12 @@ class Event(var time: Int, val target: Hero, var type: Int) : Cloneable {
                     var damage = ability.damage(attacker, target, abilityFactor)
                     hitLog.damage = damage
                     if (attacker.type.name == "伽罗" && (ability.canExpertise || ability == Wound)) {
-                        val descriptionDamage = ability.descriptionDamage(attacker)
-                        target.onHitShield(Hero::magicShield, descriptionDamage, "魔女斗篷")
-                        target.onHitShield(Hero::standShield, descriptionDamage, "血魔之怒")
+                        var shieldDamage = ability.descriptionDamage(attacker)
+                        shieldDamage = target.onHitShield(Hero::magicShield, shieldDamage, "魔女斗篷")
+                        target.onHitShield(Hero::standShield, shieldDamage, "血魔之怒")
                     }
-                    if (ability.type == Ability.TYPE_MAGIC) damage = target.onHitShield(Hero::magicShield, damage, "魔女斗篷")
+                    if (ability.type == Ability.TYPE_MAGIC) damage =
+                        target.onHitShield(Hero::magicShield, damage, "魔女斗篷")
                     if (ability.type != Ability.TYPE_REAL) damage =
                         target.onHitShield(Hero::standShield, damage, "血魔之怒")
                     when (target.ironSpeed) {
