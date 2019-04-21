@@ -38,7 +38,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="荣耀战令 S14 赛季"
+                    android:text="荣耀战令 S15 赛季"
                     android:textColor="@android:color/white"
                     android:textSize="16dp"
                     android:textStyle="bold" />
@@ -46,7 +46,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="活动结束时间 2019/04/07"
+                    android:text="活动结束时间 2019/06/23"
                     android:textColor="@android:color/white" />
 
                 <TextView
@@ -60,7 +60,7 @@
                 android:layout_width="50dp"
                 android:layout_height="50dp"
                 android:layout_marginLeft="16dp"
-                android:src="@drawable/s14_skin" />
+                android:src="@drawable/s15_skin" />
         </LinearLayout>
 
         <androidx.cardview.widget.CardView

@@ -29,6 +29,7 @@ class HeroPane(private val type: HeroType) : VBox(4.0) {
 
     private val hero = Hero(type)
     private val equipBox = HBox(2.0)
+    private val priceLabel = Label().border()
     private val passiveLabel = Label().border()
     private val xAxis = NumberAxis(-10.0, 210.0, 10.0)
     private val attackCurves = mutableListOf<AttackCurve>()
@@ -108,7 +109,7 @@ class HeroPane(private val type: HeroType) : VBox(4.0) {
     }
 
     private fun initEquips() = equipBox.apply {
-        alignment = Pos.TOP_CENTER
+        alignment = Pos.CENTER
         resetEquipButtons()
         addEventFilter(MouseEvent.MOUSE_CLICKED) {
             val pane = EquipPane(type)
@@ -123,7 +124,9 @@ class HeroPane(private val type: HeroType) : VBox(4.0) {
         val buttons = mutableListOf<Node>()
         type.equips.map(Int::toEquip).filterNotNull().forEach { buttons.add(EquipButton(it)) }
         if (buttons.isEmpty()) buttons.add(EquipButton())
-        equipBox.children.setAll(buttons)
+        equipBox.children.clear()
+        equipBox.children += priceLabel
+        equipBox.children += buttons
     }
 
     private fun initLevel() = HBox(8.0).apply {
@@ -157,16 +160,6 @@ class HeroPane(private val type: HeroType) : VBox(4.0) {
         add("额外攻击", extraLabel, row)
     }
 
-    private fun GridPane.add(key: String, value: Labeled, row: Int) {
-        val label = Label(key)
-        label.prefWidth = 60.0
-        label.alignment = Pos.TOP_CENTER
-        add(label.border(), 0, row)
-
-        value.prefWidth = 70.0
-        value.alignment = Pos.TOP_CENTER
-        add(value.border(), 1, row)
-    }
 
     private fun initChart(): Node {
         type.attackAbilities.forEachIndexed { index, _ -> attackCurves += AttackCurve(type, index) }
@@ -186,7 +179,7 @@ class HeroPane(private val type: HeroType) : VBox(4.0) {
 
     private fun update() {
         hero.updateAttributes()
-        val level = hero.level
+        priceLabel.text = "总价:\n${hero.price}"
         val passiveHaste = type.passiveHaste
         if (passiveHaste > 0) {
             passiveLabel.isVisible = true
@@ -206,15 +199,25 @@ class HeroPane(private val type: HeroType) : VBox(4.0) {
         val haste = hero.expectedHaste
         val storm = type.attackAbilities[0].canCritical && 1136 in hero.type.equips
         xAxis.label = "攻速加成 +${haste / 10f}%"
-        attackCurves.forEach { it.update(haste, storm, level) }
+        attackCurves.forEach { it.update(haste, storm, hero.level) }
     }
-
-    private fun Int.toPercent() = "+%.4f%%".format(this / 10000f)
 
     private fun initBattle() = Button("攻击吕布").apply {
         padding = Insets(16.0)
         setOnAction { startStage("", BattlePane(hero, Hero("吕布".toHero()!!))) }
     }
 
-    companion object : HashMap<String, HeroPane>()
+    companion object : HashMap<String, HeroPane>() {
+        private fun Int.toPercent() = "+%.4f%%".format(this / 10000f)
+        private fun GridPane.add(key: String, value: Labeled, row: Int) {
+            val label = Label(key)
+            label.prefWidth = 60.0
+            label.alignment = Pos.TOP_CENTER
+            add(label.border(), 0, row)
+
+            value.prefWidth = 70.0
+            value.alignment = Pos.TOP_CENTER
+            add(value.border(), 1, row)
+        }
+    }
 }

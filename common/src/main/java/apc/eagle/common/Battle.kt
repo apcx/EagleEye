@@ -2,7 +2,7 @@ package apc.eagle.common
 
 class Battle() {
 
-    private val forces = mutableListOf<List<Hero>>()
+    val forces = mutableListOf<List<Hero>>()
     private val regenEvents = mutableListOf<Event>()
     val events = mutableListOf<Event>()
     val logs = mutableListOf<Event>()

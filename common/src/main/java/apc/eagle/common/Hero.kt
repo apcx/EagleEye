@@ -63,6 +63,9 @@ class Hero(val type: HeroType) {
     var nextStandTime = 0
     var standShield = 0
 
+    val price get() = equips.sumBy { it.price }
+    var totalDamage = 0
+
     init {
         updateAttributes()
     }
@@ -176,6 +179,7 @@ class Hero(val type: HeroType) {
         channeling = false
         nextStandTime = 0
         standShield = 0
+        totalDamage = 0
     }
 
     fun criticalDamage(damage: Int, factor: Float): Int {

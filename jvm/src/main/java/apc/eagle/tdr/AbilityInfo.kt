@@ -53,11 +53,11 @@ class AbilityInfo : BaseRowModel() {
                 val type = row.toType()
                 println(row)
                 if (row.id == heroId * 100) {
+                    type.type = Ability.TYPE_PHYSICAL
                     type.attackFactor = 100
                     type.canExpertise = true
                     type.canOrb = true
                     type.canCritical = true
-                    if (type.type <= 0) type.type = Ability.TYPE_PHYSICAL
                     attackAbilities += type
                 } else if (row.slot > 0) {
                     type.isSpell = true

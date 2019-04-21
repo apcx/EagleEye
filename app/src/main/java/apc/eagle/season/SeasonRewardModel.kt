@@ -12,10 +12,10 @@ import apc.eagle.R
 import java.util.*
 import kotlin.math.max
 
-private const val SEASON_LAST_WEEK = 15
-private const val SEASON_LAST_DAY = 97
-private const val BASE_WEEK = 11
-private const val BASE_WEEK_EXP = 19200
+private const val SEASON_LAST_WEEK = 25
+private const val SEASON_LAST_DAY = 174
+private const val BASE_WEEK = 16
+private const val BASE_WEEK_EXP = 16800
 
 class SeasonRewardModel : ViewModel() {
 
@@ -50,7 +50,7 @@ class SeasonRewardModel : ViewModel() {
     internal fun onUpdate() {
         lastUpdateWeek = calendar[Calendar.WEEK_OF_YEAR]
         var requiredExp = 2000 * (80 - level.value!!) - exp.value!!
-        val weekMax = BASE_WEEK_EXP + 700 * (lastUpdateWeek - BASE_WEEK)
+        val weekMax = BASE_WEEK_EXP + 830 * (lastUpdateWeek - BASE_WEEK)
         weekExpMax.update(weekMax)
 
         val items = mutableListOf<Pair<CharSequence, CharSequence>>()
@@ -62,14 +62,9 @@ class SeasonRewardModel : ViewModel() {
         }
         val remainWeeks = SEASON_LAST_WEEK - lastUpdateWeek
         weeks.update(1 + remainWeeks)
-        if (requiredExp > 0) {
-            if (isPaid) {
-                items += "每周签到经验包" to "2000 x $remainWeeks （本周已领取）"
-                requiredExp -= 2000 * remainWeeks
-            } else {
-                items += "每周签到经验包" to "2000 x ${1 + remainWeeks}"
-                requiredExp -= 2000 * (1 + remainWeeks)
-            }
+        if (requiredExp > 0 && remainWeeks > 0) {
+            items += "每周签到经验包" to "3000 x $remainWeeks （假设本周已领取）"
+            requiredExp -= 3000 * remainWeeks
         }
         lastUpdateDay = calendar[Calendar.DAY_OF_YEAR]
         if (requiredExp > 0) {
@@ -80,11 +75,11 @@ class SeasonRewardModel : ViewModel() {
                     items += "累积登录 30 天" to "天数不够，无法达成"
                     --remainChallenges
                 }
-                if (remainChallenges > 0) {
-                    val exp = 3500 * remainChallenges
-                    items += "赛季挑战" to "3500 x $remainChallenges"
-                    requiredExp -= exp
-                }
+//                if (remainChallenges > 0) {
+//                    val exp = 3500 * remainChallenges
+//                    items += "赛季挑战" to "3500 x $remainChallenges"
+//                    requiredExp -= exp
+//                }
             }
         }
         if (requiredExp > 0) {
@@ -99,7 +94,7 @@ class SeasonRewardModel : ViewModel() {
             val questExp = mutableListOf<Int>()
             repeat(remainWeeks) {
                 if (requiredExp > 0) {
-                    val exp = weekMax + 700 * (1 + it)
+                    val exp = weekMax + 830 * (1 + it)
                     questExp += exp
                     requiredExp -= exp
                 }
@@ -131,31 +126,31 @@ class SeasonRewardModel : ViewModel() {
 
         val sp = activity.getPreferences(Context.MODE_PRIVATE)
         weeks.update(SEASON_LAST_WEEK - week + 1)
-        level.update(sp.getInt("s14_level", 1))
-        exp.update(sp.getInt("s14_exp", 0))
-        challenges.update(sp.getInt("s14_challenges", 0))
-        var loginDays = sp.getInt("s14_login", 1)
-        paid.update(sp.getBoolean("s14_paid", false))
-        epic.update(sp.getBoolean("s14_epic", false))
-        lastUpdateDay = sp.getInt("s14_lastUpdateDay", today)
-        lastUpdateWeek = sp.getInt("s14_lastUpdateWeek", week)
+        level.update(sp.getInt("s15_level", 1))
+        exp.update(sp.getInt("s15_exp", 0))
+        challenges.update(sp.getInt("s15_challenges", 0))
+        var loginDays = sp.getInt("s15_login", 1)
+        paid.update(sp.getBoolean("s15_paid", false))
+        epic.update(sp.getBoolean("s15_epic", false))
+        lastUpdateDay = sp.getInt("s15_lastUpdateDay", today)
+        lastUpdateWeek = sp.getInt("s15_lastUpdateWeek", week)
 
         if (today > lastUpdateDay) ++loginDays
         login.update(loginDays)
-        weekExp.update(if (week > lastUpdateWeek) 0 else sp.getInt("s14_weekExp", 0))
+        weekExp.update(if (week > lastUpdateWeek) 0 else sp.getInt("s15_weekExp", 0))
     }
 
     internal fun onSave(activity: Activity?) {
         activity?.getPreferences(Context.MODE_PRIVATE)?.edit {
-            putInt("s14_level", level.value!!)
-            putInt("s14_exp", exp.value!!)
-            putInt("s14_challenges", challenges.value!!)
-            putInt("s14_login", login.value!!)
-            putInt("s14_weekExp", weekExp.value!!)
-            putBoolean("s14_paid", paid.value!!)
-            putBoolean("s14_epic", epic.value!!)
-            putInt("s14_lastUpdateDay", lastUpdateDay)
-            putInt("s14_lastUpdateWeek", lastUpdateWeek)
+            putInt("s15_level", level.value!!)
+            putInt("s15_exp", exp.value!!)
+            putInt("s15_challenges", challenges.value!!)
+            putInt("s15_login", login.value!!)
+            putInt("s15_weekExp", weekExp.value!!)
+            putBoolean("s15_paid", paid.value!!)
+            putBoolean("s15_epic", epic.value!!)
+            putInt("s15_lastUpdateDay", lastUpdateDay)
+            putInt("s15_lastUpdateWeek", lastUpdateWeek)
         }
     }
 }
