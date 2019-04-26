@@ -6,6 +6,8 @@ import apc.eagle.common.HeroType
 @Suppress("unused")
 class Hero196 : HeroType() { // 百里守约
 
+    override val preferredIcon = 301964
+
     override fun initAbilities() {
         super.initAbilities()
         attackAbilities[0].run {

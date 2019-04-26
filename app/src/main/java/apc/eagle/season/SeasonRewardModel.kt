@@ -14,8 +14,8 @@ import kotlin.math.max
 
 private const val SEASON_LAST_WEEK = 25
 private const val SEASON_LAST_DAY = 174
-private const val BASE_WEEK = 16
-private const val BASE_WEEK_EXP = 16800
+private const val BASE_WEEK = 17
+private const val BASE_WEEK_EXP = 17650
 
 class SeasonRewardModel : ViewModel() {
 
