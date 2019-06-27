@@ -9,12 +9,15 @@ class Hero(val type: HeroType) {
     private val equips get() = type.equips.map(Int::toEquip).filterNotNull()
     val abilityLevels = IntArray(4)
     var baseHaste = 0
-    var auraHaste = 0
+    private var auraHaste = 0
     val expectedHaste get() = baseHaste + auraHaste + type.passiveHaste
     val haste get() = baseHaste + auraHaste
 
-    val criticalDamageRuneBonus get() = (critical + 7) * (criticalDamage + 36) - (critical * criticalDamage + 7 * 1000)
-    val criticalRuneBonus get() = 16 * (criticalDamage - 1000)
+    val criticalBonus
+        get() = if (type.attackAbilities[0].canCritical) {
+            val actualCritical = min(critical, 1000)
+            ((criticalDamage * actualCritical + 1000 * (1000 - actualCritical)) / 1000f - 1000) / 10
+        } else 0f
 
     private fun critical(attack: Int) = attack * (critical * criticalDamage + (1000 - critical) * 1000) / 1000_000
     var avgAttack = IntArray(2)
@@ -32,7 +35,7 @@ class Hero(val type: HeroType) {
     var penetrate = 0
     var penetrateRate = 0
     var critical = 0
-    var criticalDamage = 0
+    private var criticalDamage = 0
     var magic = 0
     var magicDefense = 0
     var magicPenetrate = 0
@@ -40,7 +43,7 @@ class Hero(val type: HeroType) {
     var cdr = 0
     var hasCorrupt = false
     var hasLightning = false
-    var hasShadowEdge = false
+    private var hasShadowEdge = false
     var hasExecute = false
     var hasLastStand = false
     var enchant: Ability? = null
@@ -132,6 +135,7 @@ class Hero(val type: HeroType) {
             equips.has("光辉之剑") -> enchant = Enchant
         }
         if (equips.has("虚无法杖")) magicPenetrateRate += 45
+        if (equips.has("贤者之书")) mhp += 1600
 
         val rune = type.runeConfig.toOneRune()
         mhp += rune.hp / 100
@@ -152,13 +156,14 @@ class Hero(val type: HeroType) {
             Skin.TYPE_MAGIC -> magic += 10
             Skin.TYPE_HP -> mhp += 120
         }
-        if (equips.has("破魔刀")) magicDefense += min(attack * 40 / 100, 300)
+        if (equips.has("破魔刀")) magicDefense += min(attack * 50 / 100, 300)
         if (cdr > 400) cdr = 400
 
         if (type.learn.isNotEmpty()) {
             abilityLevels.fill(0)
             for (level in 1..level) ++abilityLevels[type.learn[level - 1] - 1]
         }
+        if (criticalDamage > 2500) criticalDamage = 2500
         type.updateSpecificAttributes(this)
     }
 

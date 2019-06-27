@@ -25,6 +25,7 @@ import javafx.scene.text.Text
 import javafx.stage.Stage
 import javafx.stage.StageStyle
 
+@Suppress("UsePropertyAccessSyntax")
 class HeroPane(private val type: HeroType) : VBox(4.0) {
 
     private val hero = Hero(type)
@@ -33,7 +34,7 @@ class HeroPane(private val type: HeroType) : VBox(4.0) {
     private val passiveLabel = Label().border()
     private val xAxis = NumberAxis(-10.0, 210.0, 10.0)
     private val attackCurves = mutableListOf<AttackCurve>()
-    private val criticalLabels = Array(2) { Label() }
+    private val criticalLabel = Label()
     private val avgLabels = Array(2) { Label() }
     private val extraLabel = Label()
 
@@ -142,13 +143,8 @@ class HeroPane(private val type: HeroType) : VBox(4.0) {
     private fun initGrid() = GridPane().apply {
         alignment = Pos.TOP_CENTER
         var row = 0
-        add("无双", criticalLabels[0], row)
-        add("祸源", criticalLabels[1], row + 1)
-        val runeLabel = Label("再多一个【5级铭文】对普通攻击的增益")
-        runeLabel.padding = Insets(16.0)
-        add(runeLabel, 2, row, 1, 2)
-        row += 2
-
+        add("暴击增益", criticalLabel, row++)
+        add("额外攻击", extraLabel, row++)
         if (hero.avgAttack[0] > 0) {
             add("攻击", avgLabels[0], row)
             add(type.specialAttackName, avgLabels[1], row + 1)
@@ -157,9 +153,7 @@ class HeroPane(private val type: HeroType) : VBox(4.0) {
             add(label, 2, row, 1, 2)
             row += 2
         }
-        add("额外攻击", extraLabel, row)
     }
-
 
     private fun initChart(): Node {
         type.attackAbilities.forEachIndexed { index, _ -> attackCurves += AttackCurve(type, index) }
@@ -188,8 +182,7 @@ class HeroPane(private val type: HeroType) : VBox(4.0) {
             passiveLabel.isVisible = false
         }
 
-        criticalLabels[0].text = hero.criticalDamageRuneBonus.toPercent()
-        criticalLabels[1].text = hero.criticalRuneBonus.toPercent()
+        criticalLabel.text = "+%.4f%%".format(hero.criticalBonus)
         if (hero.avgAttack[0] > 0) {
             avgLabels[0].text = "${hero.avgAttack[0]}"
             avgLabels[1].text = "${hero.avgAttack[1]}"
@@ -208,14 +201,13 @@ class HeroPane(private val type: HeroType) : VBox(4.0) {
     }
 
     companion object : HashMap<String, HeroPane>() {
-        private fun Int.toPercent() = "+%.4f%%".format(this / 10000f)
         private fun GridPane.add(key: String, value: Labeled, row: Int) {
             val label = Label(key)
             label.prefWidth = 60.0
             label.alignment = Pos.TOP_CENTER
             add(label.border(), 0, row)
 
-            value.prefWidth = 70.0
+            value.prefWidth = 80.0
             value.alignment = Pos.TOP_CENTER
             add(value.border(), 1, row)
         }

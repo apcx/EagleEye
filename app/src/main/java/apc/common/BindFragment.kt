@@ -6,7 +6,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.collection.ArrayMap
 import androidx.databinding.ViewDataBinding
 import androidx.databinding.library.baseAdapters.BR
 import androidx.fragment.app.Fragment
@@ -65,7 +64,7 @@ abstract class BindFragment<Binding : ViewDataBinding, VM : ViewModel> : Fragmen
         }
     }
 
-    companion object : ArrayMap<String, Method>()
+    companion object : HashMap<String, Method>()
 }
 
 fun <T> MutableLiveData<T>.update(newValue: T) {

@@ -29,7 +29,7 @@ class Hero169 : HeroType() { // 后羿
         val level = hero.abilityLevels[0]
         MultipleShot.extraDamage = 160 + level * 40
         abilities[1].extraDamage = 360 + hero.abilityLevels[1] * 40
-        abilities[2].extraDamage = 525 + hero.abilityLevels[2] * 175
+        abilities[2].extraDamage = 400 + hero.abilityLevels[2] * 300
         hero.avgAttack[0] = hero.avgAttack()
         hero.avgAttack[1] = if (level <= 0) 0 else hero.avgAttack(MultipleShot)
     }
