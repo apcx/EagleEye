@@ -17,7 +17,7 @@ import javafx.scene.text.Text
 
 internal class ColorRunePane(private val hero: HeroType, private val color: Int) : BorderPane() {
 
-    private val buttons = Array(2) { RuneButton() }
+    private val buttons = Array(3) { RuneButton() }
 
     init {
         when (color) {  // http://www.w3school.com.cn/cssref/css_colornames.asp
@@ -68,7 +68,7 @@ internal class ColorRunePane(private val hero: HeroType, private val color: Int)
         buttons.forEachIndexed { index, button ->
             button.onCopy { string, drop ->
                 val rune = string.toRune()
-                if (rune == null || rune.color != color || rune == buttons[0].rune || rune == buttons[1].rune) {
+                if (rune == null || rune.color != color || buttons.any { it.rune == rune }) {
                     false
                 } else {
                     if (drop) button.rune = rune
@@ -78,7 +78,15 @@ internal class ColorRunePane(private val hero: HeroType, private val color: Int)
             button.setOnAction {
                 if (button.rune != null && button.count < 10) {
                     ++button.count
-                    --buttons[1 - index].count
+                    for (i in buttons.lastIndex downTo 0) {
+                        if (i != index) {
+                            val toReduce = buttons[i]
+                            if (toReduce.count > 0) {
+                                --toReduce.count
+                                break
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -90,8 +98,10 @@ internal class ColorRunePane(private val hero: HeroType, private val color: Int)
     }
 
     internal fun applyConfig(config: RuneConfig) {
-        buttons[1].rune = null
-        buttons[1].count = 0
+        buttons.forEach {
+            it.rune = null
+            it.count = 0
+        }
         config.toRunes(color).forEachIndexed { index, it ->
             buttons[index].count = it.second
             buttons[index].rune = it.first
