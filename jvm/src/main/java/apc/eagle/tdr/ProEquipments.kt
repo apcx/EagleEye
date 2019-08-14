@@ -57,7 +57,7 @@ class ProEquipments : BaseRowModel() {
     @ExcelProperty(index = 20)
     var equip6 = ""
 
-    override fun toString() = Json.stringify(ProEquipments.serializer, this)
+    override fun toString() = Json.stringify(serializer, this)
 
     fun toType() = EquipConfig().also {
         it.name = name
@@ -71,8 +71,8 @@ class ProEquipments : BaseRowModel() {
 
     companion object : Table<ProEquipments>() {
         override val file = "96.推荐装备列表_elu"
-        override val table = 2
-        private val serializer = ProEquipments.serializer()
+        override val table = 3
+        private val serializer = serializer()
         override fun invoke(row: ProEquipments, context: AnalysisContext) {
             row.heroId.toHero()?.run {
                 equipConfigs[row.index + 2] = row.toType()

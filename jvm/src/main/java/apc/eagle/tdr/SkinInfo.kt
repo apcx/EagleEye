@@ -10,7 +10,6 @@ import com.alibaba.excel.context.AnalysisContext
 import com.alibaba.excel.metadata.BaseRowModel
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
-import java.nio.file.NoSuchFileException
 import java.nio.file.Paths
 
 @Serializable
@@ -72,14 +71,12 @@ class SkinInfo : BaseRowModel() {
 
         @Suppress("unused")
         private fun copyResources() {
-            val icon = Paths.get("D:\\Kings\\trunk0\\UI\\5_Dynamic\\Icon")
+            val icon = Paths.get("D:\\Kings\\V46_icon")
             val res = Paths.get("src/main/resources/head")
             res.toFile().mkdirs()
-            HeroType.idMap.values.flatMap { it.skins }.forEach {
-                try {
-                    icon + "${it.icon}.png" copyTo res
-                } catch (e: NoSuchFileException) {
-                }
+            HeroType.idMap.values.forEach {
+                icon + "${it.skins[0].icon}.png" copyTo res
+                icon + "${it.preferredIcon}.png" copyTo res
             }
         }
     }

@@ -125,8 +125,8 @@ class RecommendedRuneConfig : BaseRowModel() {
 
     companion object : Table<RecommendedRuneConfig>() {
         override val file = "44.符文信息表_Chad"
-        override val table = 9
-        private val serializer = RecommendedRuneConfig.serializer()
+        override val table = 10
+        private val serializer = serializer()
         override fun invoke(row: RecommendedRuneConfig, context: AnalysisContext) {
             row.hero.toHero()?.run {
                 recommendedRuneConfigs += row.toType()

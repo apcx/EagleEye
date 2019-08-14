@@ -150,7 +150,7 @@ object EnchantVoodoo : Ability("巫术法杖", TYPE_MAGIC) {
 
 object EnchantMaster : Ability("宗师之力", TYPE_PHYSICAL) {
     init {
-        attackFactor = 100
+        attackFactor = 80
     }
 }
 

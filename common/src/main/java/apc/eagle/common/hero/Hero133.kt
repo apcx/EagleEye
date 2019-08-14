@@ -16,7 +16,7 @@ class Hero133 : HeroType() { // 狄仁杰
 
     override fun updateSpecificAttributes(hero: Hero) {
         val level = hero.abilityLevels[0]
-        RedCard.extraDamage = 108 + level * 22
+        RedCard.extraDamage = 98 + level * 22
         BlueCard.extraDamage = RedCard.extraDamage / 2
     }
 

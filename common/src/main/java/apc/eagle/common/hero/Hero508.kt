@@ -5,6 +5,7 @@ import apc.eagle.common.*
 @Suppress("unused")
 class Hero508 : HeroType() { // 伽罗
 
+    override val preferredIcon = 305082
     override val learn = intArrayOf(
         1, 2, 1, 3,
         1, 2, 1, 3,

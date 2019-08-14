@@ -119,7 +119,7 @@ class Hero(val type: HeroType) {
         if (equips.has("纯净苍穹") or equips.has("逐日之弓")) expertise += 35
         else if (equips.has("速击之枪")) expertise += 30
         if (type.attackType == UnitType.RANGE) expertise *= 2
-        if (equips.has("暗影战斧")) penetrate += 50 + level * 10
+        if (equips.has("暗影战斧")) penetrate += 50 + level * 8
         else if (equips.has("陨星")) penetrate += 60
         when {
             equips.has("碎星锤") -> penetrateRate += 40
