@@ -1,3 +1,5 @@
+@file:Suppress("UNNECESSARY_NOT_NULL_ASSERTION")
+
 package apc.common
 
 import javafx.geometry.Insets
@@ -23,6 +25,10 @@ operator fun Path.plus(other: Path) = resolve(other)!!
 
 infix fun Path.copyTo(directory: Path) {
     Files.copy(this, directory + fileName, StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.COPY_ATTRIBUTES)
+}
+
+fun Path.copyTo(directory: Path, name: String) {
+    Files.copy(this, directory + name, StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.COPY_ATTRIBUTES)
 }
 
 inline fun <reified T : Region> T.border() = apply {

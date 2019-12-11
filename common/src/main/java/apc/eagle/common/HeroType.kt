@@ -1,12 +1,12 @@
 package apc.eagle.common
 
 import com.google.gson.Gson
+import com.google.gson.JsonSyntaxException
 
 fun Int.toHero() = HeroType.idMap[this]
 fun String.toHero() = HeroType.nameMap[this]
 
 open class HeroType : UnitType() {
-
     var category = ""
     var secondaryCategory = ""
     var order = 0
@@ -27,12 +27,12 @@ open class HeroType : UnitType() {
     open val preferredIcon get() = if (skins.size >= 2) skins[1].icon else skins[0].icon
     val attackAbilities = mutableListOf<Ability>()
     val abilities = Array(4) { Ability() }
-    open val learn = IntArray(0)
-    open val passiveHaste = 0
+    open val learn get() = IntArray(0)
+    open val passiveHaste get() = 0
     open val passiveHasteName get() = attackAbilities[0].name
     open fun tempHaste(level: Int) = 0
-    open val tempHasteName = ""
-    open val specialAttackName = ""
+    open val tempHasteName get() = ""
+    open val specialAttackName get() = ""
 
     fun applyEquipConfig(index: Int = 0) {
         equipConfigs[index]?.equips?.copyInto(equips)
@@ -84,6 +84,12 @@ open class HeroType : UnitType() {
 }
 
 @Suppress("SpellCheckingInspection")
-private val gson = Gson()
+val gson = Gson()
 
 fun Any?.toJson() = gson.toJson(this)!!
+
+inline fun <reified T> String.toBean() = try {
+    gson.fromJson(this, T::class.java)
+} catch (e: JsonSyntaxException) {
+    null
+}
