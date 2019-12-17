@@ -21,6 +21,7 @@ object Tdr {
         DefaultRuneConfig.load()
         HeroEnable.load()
         HeroInfo.load()
+        SkinEnable.load()
         SkinInfo.load()
         DefaultEquipments.load()
         ProEquipments.load()

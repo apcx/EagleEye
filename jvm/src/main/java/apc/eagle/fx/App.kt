@@ -17,7 +17,7 @@ fun main(args: Array<String>) {
 class App : Application() {
     override fun start(primaryStage: Stage) {
         primaryStage.initStyle(StageStyle.UTILITY)
-        primaryStage.title = "鹰眼神射 - Res $RES_VERSION - alpha01"
+        primaryStage.title = "鹰眼神射 - Res $RES_VERSION - beta"
         primaryStage.scene = Scene(SolutionPane())
         primaryStage.show()
     }

@@ -30,44 +30,44 @@ class Equipment : BaseRowModel() {
     @ExcelProperty(index = 10)
     var level = 0
 
-    @ExcelProperty(index = 19)
+    @ExcelProperty(index = 20)
     var price = 0
 
-    @ExcelProperty(index = 21)
+    @ExcelProperty(index = 22)
     var top = 0
 
-    @ExcelProperty(index = 22)
+    @ExcelProperty(index = 23)
     @Transient
     var disable = 0
 
-    @ExcelProperty(index = 30)
+    @ExcelProperty(index = 34)
     var attack = 0
 
-    @ExcelProperty(index = 31)
+    @ExcelProperty(index = 35)
     var haste = 0
 
-    @ExcelProperty(index = 32)
+    @ExcelProperty(index = 36)
     var critical = 0
 
-    @ExcelProperty(index = 34)
+    @ExcelProperty(index = 38)
     var magic = 0
 
-    @ExcelProperty(index = 35)
+    @ExcelProperty(index = 39)
     var cdr = 0
 
-    @ExcelProperty(index = 39)
+    @ExcelProperty(index = 43)
     var defense = 0
 
-    @ExcelProperty(index = 40)
+    @ExcelProperty(index = 44)
     var magicDefense = 0
 
-    @ExcelProperty(index = 41)
+    @ExcelProperty(index = 45)
     var hp = 0
 
-    @ExcelProperty(index = 42)
+    @ExcelProperty(index = 46)
     var regen = 0
 
-    @ExcelProperty(index = 43)
+    @ExcelProperty(index = 47)
     var moveSpeed = 0
 
     override fun toString() = Json.stringify(serializer, this)
@@ -111,8 +111,9 @@ class Equipment : BaseRowModel() {
 
         @Suppress("unused")
         private fun copyResources() {
-            val icon = Paths.get("D:\\Kings\\trunk0\\UI\\4_System\\BattleEquip")
-            val res = Paths.get("resources/equip")
+            val icon =
+                Paths.get("D:\\Kings\\trunk\\Project\\Assets\\Art_Resources\\UI\\4_System\\BattleEquip")
+            val res = Paths.get("src/main/resources/equip")
             res.toFile().mkdirs()
             Equip.idMap.keys.forEach { icon + "$it.png" copyTo res }
         }

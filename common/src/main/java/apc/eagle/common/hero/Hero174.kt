@@ -5,7 +5,7 @@ import apc.eagle.common.*
 @Suppress("unused")
 class Hero174 : HeroType() { // 虞姬
 
-    override val preferredIcon = 301742
+    override val preferredIcon = 301744
     override fun tempHaste(level: Int) = if (level >= 4) 200 + level / 4 * 100 else 0
     override val tempHasteName get() = abilities[2].name
     override val learn = intArrayOf(
@@ -26,7 +26,12 @@ class Hero174 : HeroType() { // 虞姬
         actor.heroRage += 25
         if (actor.heroRage >= 100) {
             actor.heroRage -= 100
-            actor.battle.events += Event(target.battle.time + GameData.MS_FRAME * 7, target, actor, ExtraArrow)
+            actor.battle.events += Event(
+                target.battle.time + GameData.MS_FRAME * 7,
+                target,
+                actor,
+                ExtraArrow
+            )
         }
     }
 }

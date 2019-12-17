@@ -72,12 +72,11 @@ class SkinInfo : BaseRowModel() {
         private fun copyResources() {
             val icon =
                 Paths.get("D:\\Kings\\trunk\\Project\\Assets\\Art_Resources\\UI\\5_Dynamic\\Icon")
-//            val res = Paths.get("src/main/resources/head")
-            val res = Paths.get("D:\\icon")
+            val res = Paths.get("src/main/resources/head")
             res.toFile().mkdirs()
             HeroType.idMap.values.forEach {
-                (icon + "${it.skins[0].icon}.png").copyTo(res, "${it.id}.png")
-//                icon + "${it.preferredIcon}.png" copyTo res
+                //                (icon + "${it.skins[0].icon}.png").copyTo(res, "${it.id}.png")
+                icon + "${it.preferredIcon}.png" copyTo res
             }
         }
     }
